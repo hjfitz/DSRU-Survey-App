@@ -1,2 +1,6 @@
 @import 'node_modules/materialize-css/sass/materialize.scss';
-@import './builder.scss'
+@import './builder.scss';
+
+main {
+	height: 100vh;
+}

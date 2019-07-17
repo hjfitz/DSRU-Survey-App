@@ -1,6 +1,8 @@
 import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 
+import QuestionBuilder from './question-builder'
+
 class SurveyBuilder extends React.Component {
 	constructor(props) {
 		super(props)
@@ -10,6 +12,7 @@ class SurveyBuilder extends React.Component {
 		}
 		this.changeTitle = this.changeTitle.bind(this)
 		this.appendQuestion = this.appendQuestion.bind(this)
+		this.removeQuestion = this.removeQuestion.bind(this)
 	}
 
 	changeTitle(ev) {
@@ -19,10 +22,15 @@ class SurveyBuilder extends React.Component {
 	}
 
 	renderQuestions() {
-		return this.state.questions.map(question => {
-			console.log(question)
-			return 'oi'
-		})
+		return this.state.questions.map((props, idx) => (
+			<div className="card">
+				<div className="card-content">
+					<div className="row">
+						<QuestionBuilder key={props.type + props.questionText + idx} {...props} />
+					</div>
+				</div>
+			</div>
+		))
 	}
 
 	appendQuestion() {
@@ -34,6 +42,12 @@ class SurveyBuilder extends React.Component {
 		}
 
 		questions.push(newQuestion)
+		this.setState({questions})
+	}
+
+	removeQuestion() {
+		const questions = cloneDeep(this.state.questions)
+		questions.pop()
 		this.setState({questions})
 	}
 
@@ -56,10 +70,18 @@ class SurveyBuilder extends React.Component {
 						{this.renderQuestions()}
 					</div>
 					<div className="row">
-						{/* final row - add button */}
-						<a class="btn-floating btn-large waves-effect waves-light red" onClick={this.appendQuestion}>
-							<i class="material-icons">add</i>
-						</a>
+						<div className="col s12">
+							<div className="row">
+								<a className="waves-effect waves-light btn green" onClick={this.appendQuestion}>
+									Add Question
+								</a>
+							</div>
+							<div className="row">
+								<a className="waves-effect waves-light btn red" onClick={this.removeQuestion}>
+									Remove Question
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
