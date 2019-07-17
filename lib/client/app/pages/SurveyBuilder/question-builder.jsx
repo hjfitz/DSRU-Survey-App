@@ -10,78 +10,128 @@ class QuestionBuilder extends React.Component {
 			options: this.props.options || [],
 			maxVal: this.props.maxVal || 5,
 		}
+		this.questionText = React.createRef()
+		this.subQuestions = []
+
 		this.appendOption = this.appendOption.bind(this)
 		this.removeOption = this.removeOption.bind(this)
+		this.addSubquestion = this.addSubquestion.bind(this)
 	}
 
 	appendOption() {
 		const options = cloneDeep(this.state.options)
 		options.push({
 			value: '',
-			questions: []
+			question: null // if there is a subquestion, it should follow: { type, questionText, options }
 		})
 		this.setState({options})
 	}
 
 	removeOption() {
+		const options = cloneDeep(this.state.options)
+		options.pop()
+		this.setState({options})
+	}
 
+	addSubquestion(idx) {
+		return () => {
+			const options = cloneDeep(this.state.options)
+			options[idx].question = {
+				type: 'multi',
+				questionText: 'Untitled Subquestion',
+				options: []
+			}
+
+			this.setState({options})
+		}
 	}
 
 	render() {
-		const slider = <input type="range" id="test5" min="0" max={this.state.maxVal} />
+		this.subQuestions = []
+		const slider = (
+			<>
+				Maximum value:
+				<div className="input-field inline slider-input">
+					<input type="number" name="max-val" id="max-val" value={this.state.value}/>
+				</div>
+			</>
+		)
 		const multi = (
-			<div className="row">
-				{this.state.options.map(option => {
+			<div className="row multi">
+				{this.state.options.map((option, idx) =>  {
+					console.log(option)
 					return (
-						<div class="col" key={this.state.questionText + option.questionText}>
-								<input placeholder="Placeholder" id="first_name" type="text" class="validate" />
-								(button to add sub question)
+						<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + option.questionText + idx}>
+							{`Option ${idx + 1}: `}
+							<div className="input-field inline">
+								{/* text inputs for multiple choice answers */}
+								<input placeholder="Placeholder" id="first_name" type="text" className='validate' />
+							</div>
+							{option.question
+								?
+								(<div className="card-panel">
+									<div className="row">
+										<QuestionBuilder {...option.question} idx={idx + 1} level={this.props.level + 1}/>
+									</div>
+								</div>)
+								: (
+									<a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn">Add Sub-question</a>
+
+								)}
 						</div>
-				)
-			})}
-			<div className="row">
-				<div className="col s12">
-					<div className="row">
+					)
+					})}
+				{this.props.level <= 3
+				? (
+				<>
+					<div className="col s6">
 						<a className="waves-effect waves-light btn green darken-3" onClick={this.appendOption}>
 							Add Option
 						</a>
 					</div>
-					<div className="row">
+					<div className="col s6">
 						<a className="waves-effect waves-light btn red darken-3" onClick={this.removeOption}>
 							Remove Option
 						</a>
 					</div>
-				</div>
-			</div>
-			</div>
-
+				</>)
+				: ''
+			}
+		</div>
 		)
 
 		return (
-			<form className="col s12">
+			<form className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
 				<div className="row">
-					<div className="input-field col s12">
-						<input placeholder="Question Name" id="question_name" type="text" className="validate" />
-						<label htmlFor="question_name">Question</label>
+					<div className="col s12">
+						<h5>Question {this.props.idx}</h5>
 					</div>
-					<div className="input-field col s12">
+					<div className="col s9">
+						Question title:
+						<div className="inline input-field">
+							<input ref={this.questionText} placeholder="Question Name" id="question_name" type="text" className="validate question-title" onKeyUp={(ev) => this.setState()} />
+						</div>
+					</div>
+					<form className="col s3">
+						Question Type:
+						<p>
+							<label>
+								<input name={this.state.questionText + 'toggle'} type="radio" checked={this.state.type === 'multi'} onClick={() => this.setState({type: 'multi'})}/>
+								<span>Multiple choice</span>
+							</label>
+						</p>
+						<p>
+							<label>
+								<input name={this.state.questionText + 'toggle'} type="radio" checked={this.state.type === 'scalar'} onClick={() => this.setState({type: 'scalar'})} />
+								<span>Scalar</span>
+							</label>
+						</p>
+					</form>
+					<div className="col s12">
 						{this.state.type === 'multi' ? multi : slider}
 					</div>
 				</div>
-				<form className="row" onChange={console.log}>
-					<p>
-						<label>
-							<input name={this.state.questionText + 'toggle'} type="radio" />
-							<span>Multiple choice</span>
-						</label>
-					</p>
-					<p>
-						<label>
-							<input name={this.state.questionText + 'toggle'} type="radio" />
-							<span>Scalar</span>
-						</label>
-					</p>
-				</form>
+
 			</form>
 		)
 	}

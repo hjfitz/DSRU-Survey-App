@@ -3,6 +3,43 @@ import cloneDeep from 'lodash/cloneDeep'
 
 import QuestionBuilder from './question-builder'
 
+function extractData(question, level) {
+		// get title, type and then based on type, maxVal or options
+		const {value: questionText} = question.querySelector('.question-title')
+		const {questionType: type} = question.dataset
+		const ds = {
+			questionText,
+			type,
+		}
+		if (type === 'multi') {
+			// fetch and recur
+			const optsDOM = question.querySelectorAll('.multi-input-level-' + level)
+			if (optsDOM && optsDOM.length) {
+				const options = [...optsDOM].map(option => {
+					const {value} = option.querySelector('input')
+					const optDS = {
+						value,
+					}
+					const subQuestion = option.querySelector('.question-builder.level-' + (level + 1))
+					if (subQuestion) {
+						optDS.question = extractData(subQuestion, level + 1)
+					}
+					return optDS
+				})
+				ds.options = options
+			}
+		} else {
+			const scalarInput = question.querySelector('.slider-input>input')
+			ds.maxVal = parseInt(scalarInput.value, 10)
+		}
+		return ds
+}
+
+function extractAnswers(elems, level) {
+	const dataset = [...elems].map(elem => extractData(elem, level))
+	return dataset
+}
+
 class SurveyBuilder extends React.Component {
 	constructor(props) {
 		super(props)
@@ -10,6 +47,7 @@ class SurveyBuilder extends React.Component {
 			questions: [],
 			surveyName: '',
 		}
+		this.fetchData = this.fetchData.bind(this)
 		this.changeTitle = this.changeTitle.bind(this)
 		this.appendQuestion = this.appendQuestion.bind(this)
 		this.removeQuestion = this.removeQuestion.bind(this)
@@ -26,7 +64,7 @@ class SurveyBuilder extends React.Component {
 			<div className="card">
 				<div className="card-content">
 					<div className="row">
-						<QuestionBuilder key={props.type + props.questionText + idx} {...props} />
+						<QuestionBuilder key={props.type + props.questionText + idx} idx={idx + 1} level={1} {...props} />
 					</div>
 				</div>
 			</div>
@@ -51,6 +89,12 @@ class SurveyBuilder extends React.Component {
 		this.setState({questions})
 	}
 
+	fetchData() {
+		const allQuestions = document.querySelectorAll('.question-builder.level-1')
+		const surveyData = extractAnswers(allQuestions, 1)
+		console.log({surveyData})
+	}
+
 	render() {
 		return (
 			<div className="row">
@@ -70,17 +114,20 @@ class SurveyBuilder extends React.Component {
 						{this.renderQuestions()}
 					</div>
 					<div className="row">
-						<div className="col s12">
-							<div className="row">
-								<a className="waves-effect waves-light btn green" onClick={this.appendQuestion}>
-									Add Question
-								</a>
-							</div>
-							<div className="row">
-								<a className="waves-effect waves-light btn red" onClick={this.removeQuestion}>
-									Remove Question
-								</a>
-							</div>
+						<div className="col s4">
+							<a className="waves-effect waves-light btn green" onClick={this.appendQuestion}>
+								Add Question
+							</a>
+						</div>
+						<div className="col s4">
+							<a className="waves-effect waves-light btn red" onClick={this.removeQuestion}>
+								Remove Question
+							</a>
+						</div>
+						<div className="col s4">
+							<a className="waves-effect waves-light btn" onClick={this.fetchData}>
+								Save and Submit
+							</a>
 						</div>
 					</div>
 				</div>
