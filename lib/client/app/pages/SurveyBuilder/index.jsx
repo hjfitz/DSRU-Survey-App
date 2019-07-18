@@ -60,22 +60,27 @@ class SurveyBuilder extends React.Component {
 		this.removeQuestion = this.removeQuestion.bind(this)
 	}
 
+	async componentDidMount() {
+		console.log(this.props)
+		if (this.props.match && this.props.match.params.id) {
+			console.log('oi')
+			const {id} = this.props.match.params
+			// we're in edit mode. fetch the survey data and populate
+			const resp = await fetchJSON(`/api/builder/edit/${id}`)
+			if (resp.ok) {
+				const {questions, title} = await resp.json()
+				this.setState({
+					questions,
+					surveyName: title,
+				})
+			}
+		}
+	}
+
 	changeTitle(ev) {
 		this.setState({
 			surveyName: ev.target.value,
 		})
-	}
-
-	renderQuestions() {
-		return this.state.questions.map((props, idx) => (
-			<div className="card">
-				<div className="card-content">
-					<div className="row">
-						<QuestionBuilder key={props.type + props.questionText + idx} idx={idx + 1} level={1} {...props} />
-					</div>
-				</div>
-			</div>
-		))
 	}
 
 	appendQuestion() {
@@ -100,7 +105,10 @@ class SurveyBuilder extends React.Component {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		const response = await fetchJSON('/api/builder/new', newSurvey, 'POST')
+		const cb = this.state.builder
+			? () => fetchJSON(`/api/builder/edit/${this.props.params.match.id}`, newSurvey, 'PUT')
+			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
+		const response = await cb()
 		if (!response.ok) {
 			console.log('o jesus no')
 		} else {
@@ -108,6 +116,18 @@ class SurveyBuilder extends React.Component {
 			const foo = await response.json()
 			console.log({foo})
 		}
+	}
+
+	renderQuestions() {
+		return this.state.questions.map((props, idx) => (
+			<div className="card">
+				<div className="card-content">
+					<div className="row">
+						<QuestionBuilder key={props.type + props.questionText + idx} idx={idx + 1} level={1} {...props} />
+					</div>
+				</div>
+			</div>
+		))
 	}
 
 

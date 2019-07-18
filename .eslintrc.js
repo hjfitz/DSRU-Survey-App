@@ -4,7 +4,6 @@ module.exports = {
 	"env": {
 		"browser": true,
 		"node": true,
-		"mocha": true,
 	},
 	"rules": {
 		"indent": ["error", "tab"],
@@ -38,9 +37,4 @@ module.exports = {
 		"jsx-a11y/label-has-for": 0,
 
 	},
-	"settings": {
-		"react": {
-			"pragma": "h"
-		}
-	}
 };

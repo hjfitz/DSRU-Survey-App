@@ -61,12 +61,13 @@ class QuestionBuilder extends React.Component {
 			<div className="row multi">
 				{this.state.options.map((option, idx) => {
 					console.log(option)
+
 					return (
 						<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + option.questionText + idx}>
 							{`Option ${idx + 1}: `}
 							<div className="input-field inline">
 								{/* text inputs for multiple choice answers */}
-								<input placeholder="Placeholder" id="first_name" type="text" className="validate" value={option.questionText} />
+								<input placeholder="Placeholder" id="first_name" type="text" className="validate" value={option.value} />
 							</div>
 							{option.question
 								?								(

@@ -16,6 +16,7 @@ const App = () => (
 			<Route exact path="/dash" component={Dashboard} />
 			<Route exact path="/builder" component={SurveyBuilder} />
 			<Route path="/respond/:id" component={SurveyResponder} />
+			<Route path="/builder/:id" component={SurveyBuilder} />
 		</Layout>
 	</Router>
 )
