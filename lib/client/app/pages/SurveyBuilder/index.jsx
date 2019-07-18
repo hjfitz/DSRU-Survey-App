@@ -105,6 +105,8 @@ class SurveyBuilder extends React.Component {
 			console.log('o jesus no')
 		} else {
 			console.log('we good')
+			const foo = await response.json()
+			console.log({foo})
 		}
 	}
 
