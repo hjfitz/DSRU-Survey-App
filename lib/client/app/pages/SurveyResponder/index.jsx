@@ -1,4 +1,5 @@
 import React from 'react'
+import flattenDeep from 'lodash/flattenDeep'
 
 import {fetchJSON} from '../../util'
 import Question from './survey-question'
@@ -6,23 +7,39 @@ import Question from './survey-question'
 function recurAndGetQuestions(question) {
 	const {questionText} = question
 	const elem = document.querySelector(`div[data-question-name='${questionText}'`)
-	const ret = {questionText, value: 'No Response'}
+	const ret = {questionText, value: 'No response'}
 	const ds = [ret]
-	if (!elem) return ret
-	if (elem.dataset.questionType === 'multi') {
-		const checkboxes = elem.querySelectorAll(`input[data-question-name='${questionText}`)
-		const [selectedCheck] = [...checkboxes].filter(box => box.checked)
-		if (selectedCheck) ret.value = selectedCheck.value
-		// recur if necessary. we know there are options, because these elemts are rendered from options
-		ds.push(...question.options.map((option) => {
-			if (option.question) return recurAndGetQuestions(option.question)
-			return null
-		}).filter(Boolean))
-		console.log(question)
-	} else if (elem.dataset.type === 'scalar') {
-		// do this
+	const selector = `input[data-question-name='${questionText}`
+
+	// no element? user has not unihdden the correct option
+	if (!elem) {
+		ret.value = 'Not found on form'
 	}
-	return ds.flat()
+
+	if (question.options) {
+		ds.push(
+			question.options
+				.filter(option => option.question)
+				.map(option => recurAndGetQuestions(option.question)),
+		)
+	}
+	// multi choice
+	if (elem) {
+		if (elem.dataset.questionType === 'multi') {
+			// get all checkboxes and find the selected one.
+			const checkboxes = elem.querySelectorAll(selector)
+			const [selectedCheck] = [...checkboxes].filter(box => box.checked)
+			if (selectedCheck) ret.value = selectedCheck.value
+			// recur if necessary for all questions with an 'option' (subquestion)
+
+			// scalar - find the scalar input and pick it's value
+		} else if (elem.dataset.questionType === 'scalar') {
+			// do this
+			const inp = elem.querySelector(selector)
+			ret.value = inp.value
+		}
+	}
+	return ds
 }
 
 class SurveyResponder extends React.Component {
@@ -46,12 +63,8 @@ class SurveyResponder extends React.Component {
 	}
 
 	async respond() {
-		// select all questions on the screen
-		// console.log(this.state.questions)
-		// const allQuestions = document.querySelectorAll('div[data-question-name]')
-		// console.log(allQuestions)
-		const questionsAndAnswers = this.state.questions.map(recurAndGetQuestions).flat()
-		console.log({questionsAndAnswers, questions: this.state.questions})
+		const questionsAndAnswers = this.state.questions.map(recurAndGetQuestions)
+		console.log(flattenDeep(questionsAndAnswers))
 	}
 
 	render() {

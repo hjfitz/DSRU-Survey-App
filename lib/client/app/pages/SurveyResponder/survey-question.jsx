@@ -23,7 +23,13 @@ class MultiGroup extends React.Component {
 			<React.Fragment key={option.value}>
 				<p onClick={this.setSelected(idx)}>
 					<label data-question-group>
-						<input name={groupID} type="radio" checked={idx === this.state.selected} value={option.value} data-question-name={this.props.questionText} />
+						<input
+							name={groupID}
+							type="radio"
+							checked={idx === this.state.selected}
+							value={option.value}
+							data-question-name={this.props.questionText}
+						/>
 						<span>{option.value}</span>
 					</label>
 				</p>
@@ -42,7 +48,7 @@ const Question = (props) => {
 		inner = (
 			<form action="#">
 				<p className="range-field">
-					<input type="range" min="1" max={props.maxVal} className="browser-default" />
+					<input type="range" min="1" max={props.maxVal} className="browser-default" data-question-name={props.questionText} />
 				</p>
 			</form>
 		)

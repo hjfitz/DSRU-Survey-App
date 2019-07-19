@@ -52,7 +52,7 @@ class QuestionBuilder extends React.Component {
 			<>
 				Maximum value:
 				<div className="input-field inline slider-input">
-					<input type="number" name="max-val" id="max-val" value={this.state.maxVal || false} />
+					<input type="number" name="max-val" id="max-val" value={this.state.maxVal || undefined} />
 				</div>
 			</>
 		)

@@ -69,6 +69,7 @@ class SurveyBuilder extends React.Component {
 				this.setState({
 					questions,
 					surveyName: title,
+					edit: true,
 				})
 			}
 		}
@@ -102,7 +103,7 @@ class SurveyBuilder extends React.Component {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		const cb = this.state.builder
+		const cb = this.state.edit
 			? () => fetchJSON(`/api/builder/edit/${this.props.params.match.id}`, newSurvey, 'PUT')
 			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
 		const response = await cb()
