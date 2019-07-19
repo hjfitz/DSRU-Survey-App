@@ -55,6 +55,7 @@ class Dash extends React.Component {
 							<div className="card horizontal">
 								<div className="card-content survey-info">
 									<span className="card-title">{survey.title}</span>
+									<p>Total responses: {survey.count}</p>
 									<p>Created: {format(survey.created, 'HH:mm on ddd Do MMMM (YYYY)')}</p>
 								</div>
 								<div className="card-stacked card-action right-align survey-options">

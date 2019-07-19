@@ -1,27 +1,20 @@
 import React from 'react'
 import flattenDeep from 'lodash/flattenDeep'
+import M from 'materialize-css'
 
 import {fetchJSON} from '../../util'
 import Question from './survey-question'
 
-function recurAndGetQuestions(question) {
+function recurAndGetQuestions(question, prev = '') {
 	const {questionText} = question
 	const elem = document.querySelector(`div[data-question-name='${questionText}'`)
-	const ret = {questionText, value: 'No response'}
+	const ret = {questionText: prev + questionText, value: 'No response'}
 	const ds = [ret]
 	const selector = `input[data-question-name='${questionText}`
 
 	// no element? user has not unihdden the correct option
 	if (!elem) {
 		ret.value = 'Not found on form'
-	}
-
-	if (question.options) {
-		ds.push(
-			question.options
-				.filter(option => option.question)
-				.map(option => recurAndGetQuestions(option.question)),
-		)
 	}
 	// multi choice
 	if (elem) {
@@ -39,6 +32,19 @@ function recurAndGetQuestions(question) {
 			ret.value = inp.value
 		}
 	}
+
+	// todo: for questionText, append previous question title
+	if (question.options) {
+		ds.push(
+			question.options
+				.filter(option => option.question)
+				.map(option => recurAndGetQuestions(option.question, `${questionText} (${option.value}) > `)),
+			// for without a prefix
+			// .map(option => recurAndGetQuestions(option.question)),
+
+		)
+	}
+
 	return ds
 }
 
@@ -63,8 +69,16 @@ class SurveyResponder extends React.Component {
 	}
 
 	async respond() {
-		const questionsAndAnswers = this.state.questions.map(recurAndGetQuestions)
-		console.log(flattenDeep(questionsAndAnswers))
+		const questionsAndAnswers = flattenDeep(this.state.questions.map(qu => recurAndGetQuestions(qu)))
+		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
+		if (resp.ok) {
+			M.toast({html: 'Successfully saved result'})
+			// todo: redirect to a thankyou page
+			// let the user know and redirect them
+			console.log(await resp.json())
+		} else {
+			M.toast({html: 'There was an error submitting your response'})
+		}
 	}
 
 	render() {
