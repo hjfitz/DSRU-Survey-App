@@ -50,8 +50,6 @@ class SurveyBuilder extends React.Component {
 		super(props)
 		this.state = {
 			questions: [],
-			// test data to ensure that the form can be rebuild for editing
-			// questions: [{questionText: 'Question the first', type: 'multi', options: [{value: 'Yes please', question: {questionText: 'This is another question', type: 'multi', options: [{value: 'Ok'}, {value: 'No', question: {questionText: 'But why', type: 'scalar', maxVal: 10}}]}}, {value: 'No thank you'}]}],
 			surveyName: '',
 		}
 		this.fetchData = this.fetchData.bind(this)
@@ -61,9 +59,8 @@ class SurveyBuilder extends React.Component {
 	}
 
 	async componentDidMount() {
-		console.log(this.props)
+		// if we have an ID, we're in edit mode
 		if (this.props.match && this.props.match.params.id) {
-			console.log('oi')
 			const {id} = this.props.match.params
 			// we're in edit mode. fetch the survey data and populate
 			const resp = await fetchJSON(`/api/builder/edit/${id}`)

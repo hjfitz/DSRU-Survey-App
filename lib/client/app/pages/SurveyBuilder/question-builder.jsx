@@ -10,7 +10,6 @@ class QuestionBuilder extends React.Component {
 			options: props.options || [],
 			maxVal: props.maxVal || 5,
 		}
-		console.log(props)
 		this.questionText = React.createRef()
 		this.subQuestions = []
 
@@ -67,7 +66,7 @@ class QuestionBuilder extends React.Component {
 							{`Option ${idx + 1}: `}
 							<div className="input-field inline">
 								{/* text inputs for multiple choice answers */}
-								<input placeholder="Placeholder" id="first_name" type="text" className="validate" value={option.value} />
+								<input placeholder="Placeholder" type="text" className="validate" value={option.value || undefined} />
 							</div>
 							{option.question
 								?								(
@@ -117,10 +116,9 @@ class QuestionBuilder extends React.Component {
 								ref={this.questionText}
 								placeholder="Question Name"
 								value={this.state.questionText}
-								id="question_name"
 								type="text"
 								className="validate question-title"
-								onKeyUp={ev => this.setState()}
+								// onKeyUp={ev => this.setState()}
 							/>
 						</div>
 					</div>

@@ -37,17 +37,16 @@ class MultiGroup extends React.Component {
 }
 
 const Question = (props) => {
-	console.log(props)
 	let inner = ''
-	if (props.type === 'Multi') {
-		console.log(props.options)
+	const questionType = props.type.toLowerCase()
+	if (questionType === 'multi') {
 		// inner = props.options.map(option => <MultiChoice {...option} />)
 		inner = <MultiGroup options={props.options} />
-	} else if (props.type === 'Scalar') {
+	} else if (questionType === 'scalar') {
 		inner = (
 			<form action="#">
 				<p className="range-field">
-					<input type="range" id="test5" min="1" max={props.maxVal} className="browser-default" />
+					<input type="range" min="1" max={props.maxVal} className="browser-default" />
 				</p>
 			</form>
 		)
