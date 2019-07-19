@@ -61,7 +61,7 @@ class Dash extends React.Component {
 								<div className="card-stacked card-action right-align survey-options">
 									<Link to={`/respond/${survey._id}`}>View</Link>
 									<Link to={`/builder/${survey._id}`}>Edit</Link>
-									<Link>Get CSV</Link>
+									<a download href={`/api/builder/csv/${survey._id}.csv`}>Get CSV</a>
 									<Link href="!#" onClick={() => copySurveyLink(survey._id, survey.title)}>Copy Link</Link>
 									<Link onClick={this.deleteSurvey(survey._id, survey.title)}>Delete</Link>
 								</div>
