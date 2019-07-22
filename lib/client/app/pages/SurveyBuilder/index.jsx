@@ -105,10 +105,10 @@ class SurveyBuilder extends React.Component {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		// const cb = this.state.edit
-		// // todo: add warning that current responses will be lost and add option to download current data
-		// 	? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
-		// 	: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
+		const cb = this.state.edit
+		// todo: add warning that current responses will be lost and add option to download current data
+			? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
+			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
 		const response = await cb()
 		if (!response.ok) {
 			M.toast({html: 'There was an error updating the survey'})

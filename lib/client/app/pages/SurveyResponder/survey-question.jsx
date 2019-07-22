@@ -2,19 +2,20 @@ import React from 'react'
 import shortid from 'shortid'
 import M from 'materialize-css'
 
+import Modal from '../modal'
+
 // todo: move this to a functional component with hooks?
 class MultiGroup extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			options: props.options,
+			helpText: "Shouldn't see this",
 			selected: -1,
+			groupID: shortid.generate(),
 		}
 		this.setSelected = this.setSelected.bind(this)
-	}
-
-	setSelected(num) {
-		return () => this.setState({selected: num})
+		// this.modal = React.createRef()
 	}
 
 	componentDidMount() {
@@ -24,27 +25,49 @@ class MultiGroup extends React.Component {
 		range.forEach(elem => M.Range.init(elem))
 	}
 
+
+	setSelected(num) {
+		return () => this.setState({selected: num})
+	}
+
+	showHelp(helpText) {
+		return () => {
+			this.setState({helpText}, () => {
+				const inst = M.Modal.init(this.modal)
+				inst.open()
+			})
+		}
+	}
+
 	render() {
 		// generate a random ID per place in hierarchy in order to select multiple items
-		const groupID = shortid.generate()
-		return this.state.options.map((option, idx) => (
-			<React.Fragment key={option._id}>
-				<p onClick={this.setSelected(idx)}>
-					<label data-question-group>
-						<input
-							name={groupID}
-							type="radio"
-							className="with-gap"
-							checked={idx === this.state.selected}
-							value={option.value}
-							data-question-name={this.props.questionText}
-						/>
-						<span>{option.value}</span>
-					</label>
-				</p>
-				{((idx === this.state.selected) && option.question) ? <Question {...option.question} idx={idx} /> : ''}
-			</React.Fragment>
-		))
+		return (
+			<>
+				{this.state.options.map((option, idx) => (
+					<React.Fragment key={option._id}>
+						<p onClick={this.setSelected(idx)}>
+							<label data-question-group>
+								<input
+									name={this.state.groupID}
+									type="radio"
+									className="with-gap"
+									checked={idx === this.state.selected}
+									value={option.value}
+									data-question-name={this.props.questionText}
+								/>
+								<span>{option.value}</span>
+								{option.helpText
+									? <i className="material-icons right cp" onClick={this.showHelp(option.helpText)}>help_outline</i>
+									: ''
+								}
+							</label>
+						</p>
+						{((idx === this.state.selected) && option.question) ? <Question {...option.question} idx={idx} /> : ''}
+					</React.Fragment>
+				))}
+				<Modal inRef={ref => this.modal = ref} id={this.state.groupID} header="information" text={this.state.helpText} />
+			</>
+		)
 	}
 }
 
