@@ -8,6 +8,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Dashboard from './pages/Dash'
 import SurveyBuilder from './pages/SurveyBuilder'
 import SurveyResponder from './pages/SurveyResponder'
+import Login from './pages/Login'
 import Layout from './layout'
 
 const App = () => (
@@ -15,6 +16,7 @@ const App = () => (
 		<Layout>
 			<Route exact path="/dash" component={Dashboard} />
 			<Route exact path="/builder" component={SurveyBuilder} />
+			<Route exact path="/login" component={Login} />
 			<Route path="/respond/:id" component={SurveyResponder} />
 			<Route path="/builder/:id" component={SurveyBuilder} />
 		</Layout>

@@ -1,5 +1,4 @@
 import React from 'react'
-import shortid from 'shortid'
 import cloneDeep from 'lodash/cloneDeep'
 
 class QuestionBuilder extends React.Component {
@@ -69,33 +68,65 @@ class QuestionBuilder extends React.Component {
 		const multi = (
 			<div className="row multi">
 				{this.state.options.map((option, idx) => (
-					<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + idx}>
-						{`Option ${idx + 1}: `}
-						<div className="input-field inline">
-							{/* text inputs for multiple choice answers */}
-							<input
-								placeholder="Placeholder"
-								type="text"
-								className="validate"
-								value={option.value || undefined}
-								onChange={(ev) => {
-									const opts = cloneDeep(this.state.options)
-									opts[idx].value = ev.target.value
-									this.setState({options: opts})
-								}}
-							/>
-						</div>
-						{option.question
-							? (
-								<div className="card-panel">
-									<div className="row">
-										<QuestionBuilder {...option.question} idx={idx + 1} level={this.props.level + 1} removeSubQuestion={this.removeSubQuestion(option._id)} />
+					<>
+						<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + idx}>
+							<div className="row">
+								<div className="col s6">
+									{`Option ${idx + 1}: `}
+									<div className="input-field">
+										{/* text inputs for multiple choice answers */}
+										<input
+											placeholder="Response"
+											type="text"
+											className="validate question-value"
+											value={option.value || undefined}
+											onChange={(ev) => {
+												const opts = cloneDeep(this.state.options)
+												opts[idx].value = ev.target.value
+												this.setState({options: opts})
+											}}
+										/>
+									</div>
+
+								</div>
+
+								<div className="col s6">
+									{`(Optional) Help Text for ${idx + 1}: `}
+									<div className="input-field">
+										{/* text inputs for multiple choice answers */}
+										<textarea
+											placeholder="Help Text"
+											type="text"
+											className="materialize-textarea question-help"
+											value={option.helpText || undefined}
+											onChange={(ev) => {
+												const opts = cloneDeep(this.state.options)
+												opts[idx].helpText = ev.target.value
+												this.setState({options: opts})
+											}}
+										/>
 									</div>
 								</div>
-							)
-							: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn">Add Sub-question</a>
-						}
-					</div>
+							</div>
+							{/* if there's an existing subquestion, show it. if not, give the option */}
+							{option.question
+								? (
+									<div className="card-panel">
+										<div className="row">
+											<QuestionBuilder
+												{...option.question}
+												idx={idx + 1}
+												level={this.props.level + 1}
+												removeSubQuestion={this.removeSubQuestion(option._id)}
+											/>
+										</div>
+									</div>
+								)
+								: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn">Add Sub-question</a>
+							}
+							<hr />
+						</div>
+					</>
 				))}
 				<div className="col s6">
 					<a className="waves-effect waves-light btn green darken-3" onClick={this.appendOption}>Add Option</a>

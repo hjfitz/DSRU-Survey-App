@@ -21,9 +21,9 @@ function extractData(question, level) {
 		// if there are options, add them
 		if (optsDOM && optsDOM.length) {
 			const options = [...optsDOM].map((option) => {
-				const {value} = option.querySelector('input')
-
-				const optDS = {value}
+				const {value} = option.querySelector('input.question-value')
+				const {value: helpText} = option.querySelector('textarea.question-help')
+				const optDS = {value, helpText}
 				const subQuestion = option.querySelector(`.question-builder.level-${level + 1}`)
 				if (subQuestion) {
 					// recur if there's a lower level
@@ -105,10 +105,10 @@ class SurveyBuilder extends React.Component {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		const cb = this.state.edit
-		// todo: add warning that current responses will be lost and add option to download current data
-			? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
-			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
+		// const cb = this.state.edit
+		// // todo: add warning that current responses will be lost and add option to download current data
+		// 	? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
+		// 	: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
 		const response = await cb()
 		if (!response.ok) {
 			M.toast({html: 'There was an error updating the survey'})

@@ -1,6 +1,6 @@
 import React from 'react'
 import format from 'date-fns/format'
-import {Link} from 'react-router-dom'
+import {Link, Redirect} from 'react-router-dom'
 import M from 'materialize-css'
 
 import {fetchJSON} from '../util'
@@ -16,14 +16,20 @@ class Dash extends React.Component {
 		super(props)
 		this.state = {
 			surveys: [],
+			redir: false,
 		}
 	}
 
 	async componentDidMount() {
 		const resp = await fetchJSON('/api/builder/all')
+		console.log(resp)
 		if (resp.ok) {
 			const surveys = await resp.json()
 			this.setState({surveys})
+		} else {
+			console.log(await resp.json())
+			M.toast({html: 'You need to login to view the dashboard'})
+			this.setState({redir: true})
 		}
 	}
 
@@ -41,6 +47,9 @@ class Dash extends React.Component {
 	}
 
 	render() {
+		if (this.state.redir) {
+			return <Redirect to={`/login?prev=${encodeURIComponent(window.location.pathname)}`} />
+		}
 		return (
 			<>
 				<h1>Welcome!</h1>
