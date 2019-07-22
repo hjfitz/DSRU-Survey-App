@@ -62,4 +62,4 @@ typings/
 
 .cache
 
-public/*
+build/*
