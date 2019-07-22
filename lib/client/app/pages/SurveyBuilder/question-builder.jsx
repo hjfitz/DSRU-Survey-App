@@ -28,23 +28,10 @@ class QuestionBuilder extends React.Component {
 		this.setState({options})
 	}
 
-	removeOption(id) {
-		if (!id) {
-			const options = cloneDeep(this.state.options)
-			options.pop()
-			this.setState({options})
-		} else {
-			return () => {
-				console.log(this.state.options)
-				const options = cloneDeep(this.state.options)
-				const [curOption] = options.filter(opt => opt._id === id)
-				delete curOption.question
-				console.log(curOption)
-				// questions.splice(idx, 1)
-				// console.log(questions)
-				this.setState({options})
-			}
-		}
+	removeOption() {
+		const options = cloneDeep(this.state.options)
+		options.pop()
+		this.setState({options})
 	}
 
 	addSubquestion(idx) {
@@ -56,6 +43,15 @@ class QuestionBuilder extends React.Component {
 				options: [],
 			}
 
+			this.setState({options})
+		}
+	}
+
+	removeSubQuestion(idx) {
+		return () => {
+			const options = cloneDeep(this.state.options)
+			const [curOption] = options.filter(opt => opt._id === idx)
+			delete curOption.question
 			this.setState({options})
 		}
 	}
@@ -93,7 +89,7 @@ class QuestionBuilder extends React.Component {
 							? (
 								<div className="card-panel">
 									<div className="row">
-										<QuestionBuilder {...option.question} idx={idx + 1} level={this.props.level + 1} removeOption={this.removeOption(option._id)} />
+										<QuestionBuilder {...option.question} idx={idx + 1} level={this.props.level + 1} removeSubQuestion={this.removeSubQuestion(option._id)} />
 									</div>
 								</div>
 							)
@@ -115,7 +111,7 @@ class QuestionBuilder extends React.Component {
 
 				<div className="row">
 					<div className="col s12">
-						<i className="material-icons right remove-button" onClick={this.props.removeOption}>clear</i>
+						<i className="material-icons right remove-button" onClick={this.props.removeSubQuestion}>clear</i>
 						<h5>Question {this.props.idx}</h5>
 					</div>
 					<div className="col s9">

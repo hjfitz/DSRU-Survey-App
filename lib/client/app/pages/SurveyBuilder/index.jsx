@@ -56,8 +56,8 @@ class SurveyBuilder extends React.Component {
 		this.fetchData = this.fetchData.bind(this)
 		this.changeTitle = this.changeTitle.bind(this)
 		this.appendQuestion = this.appendQuestion.bind(this)
+		this.removeLastQuestion = this.removeLastQuestion.bind(this)
 		this.removeQuestion = this.removeQuestion.bind(this)
-		this.removeOption = this.removeOption.bind(this)
 	}
 
 	async componentDidMount() {
@@ -92,7 +92,7 @@ class SurveyBuilder extends React.Component {
 		this.setState({questions})
 	}
 
-	removeQuestion() {
+	removeLastQuestion() {
 		const questions = cloneDeep(this.state.questions)
 		questions.pop()
 		this.setState({questions})
@@ -119,7 +119,7 @@ class SurveyBuilder extends React.Component {
 	}
 
 	// todo: merge this in to removeQuestion
-	removeOption(idx) {
+	removeQuestion(idx) {
 		return () => {
 			const questions = cloneDeep(this.state.questions)
 			questions.splice(idx, 1)
@@ -133,7 +133,7 @@ class SurveyBuilder extends React.Component {
 			<div className="card" key={props.type + props.questionText + idx}>
 				<div className="card-content">
 					<div className="row">
-						<QuestionBuilder idx={idx + 1} level={1} {...props} edit={this.state.edit} removeOption={this.removeOption(idx)} />
+						<QuestionBuilder idx={idx + 1} level={1} {...props} edit={this.state.edit} removeSubQuestion={this.removeQuestion(idx)} />
 					</div>
 				</div>
 			</div>
@@ -174,7 +174,7 @@ class SurveyBuilder extends React.Component {
 							</a>
 						</div>
 						<div className="col s4">
-							<a className="waves-effect waves-light btn red" onClick={this.removeQuestion}>
+							<a className="waves-effect waves-light btn red" onClick={this.removeLastQuestion}>
 								Remove Question
 							</a>
 						</div>
