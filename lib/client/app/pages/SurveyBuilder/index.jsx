@@ -106,7 +106,6 @@ class SurveyBuilder extends React.Component {
 			title: this.state.surveyName,
 		}
 		const cb = this.state.edit
-		// todo: implement PUT
 		// todo: add warning that current responses will be lost and add option to download current data
 			? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
 			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
@@ -119,6 +118,7 @@ class SurveyBuilder extends React.Component {
 		}
 	}
 
+	// todo: merge this in to removeQuestion
 	removeOption(idx) {
 		return () => {
 			const questions = cloneDeep(this.state.questions)

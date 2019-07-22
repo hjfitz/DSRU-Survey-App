@@ -1,5 +1,6 @@
 import React from 'react'
 import shortid from 'shortid'
+import M from 'materialize-css'
 
 // todo: move this to a functional component with hooks?
 class MultiGroup extends React.Component {
@@ -16,11 +17,18 @@ class MultiGroup extends React.Component {
 		return () => this.setState({selected: num})
 	}
 
+	componentDidMount() {
+		console.log('oi')
+		const range = document.querySelectorAll('input[type="range"]')
+		console.log({range})
+		range.forEach(elem => M.Range.init(elem))
+	}
+
 	render() {
 		// generate a random ID per place in hierarchy in order to select multiple items
 		const groupID = shortid.generate()
 		return this.state.options.map((option, idx) => (
-			<React.Fragment key={option.value}>
+			<React.Fragment key={option._id}>
 				<p onClick={this.setSelected(idx)}>
 					<label data-question-group>
 						<input
@@ -40,35 +48,46 @@ class MultiGroup extends React.Component {
 	}
 }
 
-const Question = (props) => {
-	let inner = ''
-	const questionType = props.type.toLowerCase()
-	if (questionType === 'multi') {
-		inner = <MultiGroup options={props.options} questionText={props.questionText} />
-	} else if (questionType === 'scalar') {
-		inner = (
-			<form action="#">
-				<p className="range-field">
-					<input type="range" min="1" max={props.maxVal} className="browser-default" data-question-name={props.questionText} />
-				</p>
-			</form>
-		)
+class Question extends React.Component {
+	constructor(props) {
+		super(props)
 	}
 
-	return (
-		<section className="row">
-			<div className="col s12">
-				<div className="card">
-					<div className="card-content">
-						<span className="card-title">{props.idx + 1}) {props.questionText}</span>
-						<div data-question-name={props.questionText} data-question-type={questionType}>
-							{inner}
+	componentDidUpdate() {
+		M.Range.init(document.querySelectorAll('input[type="range"]'))
+	}
+
+	render() {
+		const {props} = this
+		let inner = ''
+		const questionType = props.type.toLowerCase()
+		if (questionType === 'multi') {
+			inner = <MultiGroup options={props.options} questionText={props.questionText} />
+		} else if (questionType === 'scalar') {
+			inner = (
+				<form action="#">
+					<p className="range-field">
+						<input type="range" min="1" max={props.maxVal} data-question-name={props.questionText} />
+					</p>
+				</form>
+			)
+		}
+
+		return (
+			<section className="row">
+				<div className="col s12">
+					<div className="card">
+						<div className="card-content">
+							<span className="card-title">{props.idx + 1}) {props.questionText}</span>
+							<div data-question-name={props.questionText} data-question-type={questionType}>
+								{inner}
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</section>
-	)
+			</section>
+		)
+	}
 }
 
 export default Question
