@@ -2,7 +2,7 @@ import React from 'react'
 import shortid from 'shortid'
 import M from 'materialize-css'
 
-import Modal from '../modal'
+import Modal from '../../partials/modal'
 
 // todo: move this to a functional component with hooks?
 class MultiGroup extends React.Component {
@@ -19,9 +19,7 @@ class MultiGroup extends React.Component {
 	}
 
 	componentDidMount() {
-		console.log('oi')
 		const range = document.querySelectorAll('input[type="range"]')
-		console.log({range})
 		range.forEach(elem => M.Range.init(elem))
 	}
 
@@ -45,8 +43,8 @@ class MultiGroup extends React.Component {
 			<>
 				{this.state.options.map((option, idx) => (
 					<React.Fragment key={option._id}>
-						<p onClick={this.setSelected(idx)}>
-							<label data-question-group>
+						<p>
+							<label onClick={this.setSelected(idx)} data-question-group>
 								<input
 									name={this.state.groupID}
 									type="radio"
@@ -56,11 +54,11 @@ class MultiGroup extends React.Component {
 									data-question-name={this.props.questionText}
 								/>
 								<span>{option.value}</span>
-								{option.helpText
-									? <i className="material-icons right cp" onClick={this.showHelp(option.helpText)}>help_outline</i>
-									: ''
-								}
 							</label>
+							{option.helpText
+								? <i className="material-icons right cp grey-text" onClick={this.showHelp(option.helpText)}>help_outline</i>
+								: ''
+							}
 						</p>
 						{((idx === this.state.selected) && option.question) ? <Question {...option.question} idx={idx} /> : ''}
 					</React.Fragment>
@@ -74,10 +72,12 @@ class MultiGroup extends React.Component {
 class Question extends React.Component {
 	constructor(props) {
 		super(props)
+		this.range = React.createRef()
 	}
 
 	componentDidUpdate() {
-		M.Range.init(document.querySelectorAll('input[type="range"]'))
+		// M.Range.init(document.querySelectorAll('input[type="range"]'))
+		M.Range.init(this.range.current)
 	}
 
 	render() {
@@ -90,25 +90,23 @@ class Question extends React.Component {
 			inner = (
 				<form action="#">
 					<p className="range-field">
-						<input type="range" min="1" max={props.maxVal} data-question-name={props.questionText} />
+						<input type="range" min="1" max={props.maxVal} ref={this.range} data-question-name={props.questionText} />
 					</p>
 				</form>
 			)
 		}
 
 		return (
-			<section className="row">
-				<div className="col s12">
-					<div className="card">
-						<div className="card-content">
-							<span className="card-title">{props.idx + 1}) {props.questionText}</span>
-							<div data-question-name={props.questionText} data-question-type={questionType}>
-								{inner}
-							</div>
-						</div>
+
+			<section className="card">
+				<div className="card-content">
+					<span className="card-title">{props.idx + 1}) {props.questionText}</span>
+					<div data-question-name={props.questionText} data-question-type={questionType}>
+						{inner}
 					</div>
 				</div>
 			</section>
+
 		)
 	}
 }

@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "parcel lib/client/index.html --out-dir public --no-hmr",
+    "build": "parcel lib/client/index.html --out-dir build --no-hmr",
     "start": "node lib/server",
     "dev": "nodemon lib/server"
   },

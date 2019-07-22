@@ -8,7 +8,7 @@ const Modal = props => (
 			<section dangerouslySetInnerHTML={{__html: marked(props.text)}} />
 		</div>
 		<div className="modal-footer">
-			<a href="#!" className="modal-close waves-effect waves-green btn-flat">Agree</a>
+			<a href="#!" className="modal-close waves-effect waves-green btn-flat">Close</a>
 		</div>
 	</div>
 )

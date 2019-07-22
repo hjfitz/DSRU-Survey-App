@@ -84,11 +84,16 @@ class SurveyResponder extends React.Component {
 	render() {
 		return (
 			<>
-				<h1>{this.state.title}</h1>
-				{this.state.questions.map((question, idx) => <Question key={question._id} {...question} idx={idx} />)}
-				<button className="btn waves-effect waves-light" type="submit" name="action" onClick={this.respond}>
+				<div className="row">
+					<div className="col s12">
+
+						<h1>{this.state.title}</h1>
+						{this.state.questions.map((question, idx) => <Question key={question._id} {...question} idx={idx} />)}
+						<button className="btn waves-effect waves-light" type="submit" name="action" onClick={this.respond}>
 				Submit <i className="material-icons right">send</i>
-				</button>
+						</button>
+					</div>
+				</div>
 			</>
 		)
 	}
