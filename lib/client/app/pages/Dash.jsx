@@ -50,7 +50,7 @@ class Dash extends React.Component {
 					</div>
 				</section>
 				{this.state.surveys.map(survey => (
-					<section className="row">
+					<section className="row" key={survey._id}>
 						<div className="col s12">
 							<div className="card horizontal">
 								<div className="card-content survey-info">

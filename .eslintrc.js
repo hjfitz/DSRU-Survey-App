@@ -24,6 +24,7 @@ module.exports = {
 		"react/no-access-state-in-setstate": 0,
 		"react/destructuring-assignment": 0,
 		"react/jsx-indent": [2, 'tab'],
+		"react/no-array-index-key": 0,
 		"react/react-in-jsx-scope": 0,
 		"react/jsx-indent-props": 0,
 		"react/prop-types": 0,

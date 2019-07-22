@@ -1,4 +1,5 @@
 import React from 'react'
+import shortid from 'shortid'
 import cloneDeep from 'lodash/cloneDeep'
 
 class QuestionBuilder extends React.Component {
@@ -27,10 +28,23 @@ class QuestionBuilder extends React.Component {
 		this.setState({options})
 	}
 
-	removeOption() {
-		const options = cloneDeep(this.state.options)
-		options.pop()
-		this.setState({options})
+	removeOption(id) {
+		if (!id) {
+			const options = cloneDeep(this.state.options)
+			options.pop()
+			this.setState({options})
+		} else {
+			return () => {
+				console.log(this.state.options)
+				const options = cloneDeep(this.state.options)
+				const [curOption] = options.filter(opt => opt._id === id)
+				delete curOption.question
+				console.log(curOption)
+				// questions.splice(idx, 1)
+				// console.log(questions)
+				this.setState({options})
+			}
+		}
 	}
 
 	addSubquestion(idx) {
@@ -52,61 +66,56 @@ class QuestionBuilder extends React.Component {
 			<>
 				Maximum value:
 				<div className="input-field inline slider-input">
-					<input type="number" name="max-val" id="max-val" value={this.state.maxVal || undefined} />
+					<input type="number" name="max-val" id="max-val" value={this.state.maxVal} onChange={ev => this.setState({maxVal: ev.target.value})} />
 				</div>
 			</>
 		)
 		const multi = (
 			<div className="row multi">
-				{this.state.options.map((option, idx) => {
-					console.log(option)
-
-					return (
-						<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + option.questionText + idx}>
-							{`Option ${idx + 1}: `}
-							<div className="input-field inline">
-								{/* text inputs for multiple choice answers */}
-								<input placeholder="Placeholder" type="text" className="validate" value={option.value || undefined} />
-							</div>
-							{option.question
-								?								(
-									<div className="card-panel">
-										<div className="row">
-											<QuestionBuilder {...option.question} idx={idx + 1} level={this.props.level + 1} />
-										</div>
-									</div>
-								)
-								: (
-									<a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn">Add Sub-question</a>
-
-								)}
+				{this.state.options.map((option, idx) => (
+					<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + idx}>
+						{`Option ${idx + 1}: `}
+						<div className="input-field inline">
+							{/* text inputs for multiple choice answers */}
+							<input
+								placeholder="Placeholder"
+								type="text"
+								className="validate"
+								value={option.value || undefined}
+								onChange={(ev) => {
+									const opts = cloneDeep(this.state.options)
+									opts[idx].value = ev.target.value
+									this.setState({options: opts})
+								}}
+							/>
 						</div>
-					)
-				})}
-				{this.props.level <= 3
-					? (
-						<>
-							<div className="col s6">
-								<a className="waves-effect waves-light btn green darken-3" onClick={this.appendOption}>
-							Add Option
-								</a>
-							</div>
-							<div className="col s6">
-								<a className="waves-effect waves-light btn red darken-3" onClick={this.removeOption}>
-							Remove Option
-								</a>
-							</div>
-						</>
-					)
-					: ''
-				}
+						{option.question
+							? (
+								<div className="card-panel">
+									<div className="row">
+										<QuestionBuilder {...option.question} idx={idx + 1} level={this.props.level + 1} removeOption={this.removeOption(option._id)} />
+									</div>
+								</div>
+							)
+							: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn">Add Sub-question</a>
+						}
+					</div>
+				))}
+				<div className="col s6">
+					<a className="waves-effect waves-light btn green darken-3" onClick={this.appendOption}>Add Option</a>
+				</div>
+				<div className="col s6">
+					<a className="waves-effect waves-light btn red darken-3" onClick={this.removeOption}>Remove Option</a>
+				</div>
 			</div>
 		)
 
 		return (
-			<form className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
+			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
+
 				<div className="row">
 					<div className="col s12">
+						<i className="material-icons right remove-button" onClick={this.props.removeOption}>clear</i>
 						<h5>Question {this.props.idx}</h5>
 					</div>
 					<div className="col s9">
@@ -118,17 +127,17 @@ class QuestionBuilder extends React.Component {
 								value={this.state.questionText}
 								type="text"
 								className="validate question-title"
-								// onKeyUp={ev => this.setState()}
 							/>
 						</div>
 					</div>
-					<form className="col s3">
+					<aside className="col s3">
 						Question Type:
 						<p>
 							<label>
 								<input
 									name={`${this.state.questionText}toggle`}
 									type="radio"
+									className="with-gap"
 									checked={this.state.type === 'multi'}
 									onClick={() => this.setState({type: 'multi'})}
 								/>
@@ -140,19 +149,20 @@ class QuestionBuilder extends React.Component {
 								<input
 									name={`${this.state.questionText}toggle`}
 									type="radio"
+									className="with-gap"
 									checked={this.state.type === 'scalar'}
 									onClick={() => this.setState({type: 'scalar'})}
 								/>
 								<span>Scalar</span>
 							</label>
 						</p>
-					</form>
+					</aside>
 					<div className="col s12">
 						{this.state.type === 'multi' ? multi : slider}
 					</div>
 				</div>
 
-			</form>
+			</section>
 		)
 	}
 }

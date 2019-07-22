@@ -1,5 +1,6 @@
 import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
+import M from 'materialize-css'
 
 import QuestionBuilder from './question-builder'
 import {fetchJSON} from '../../util'
@@ -56,6 +57,7 @@ class SurveyBuilder extends React.Component {
 		this.changeTitle = this.changeTitle.bind(this)
 		this.appendQuestion = this.appendQuestion.bind(this)
 		this.removeQuestion = this.removeQuestion.bind(this)
+		this.removeOption = this.removeOption.bind(this)
 	}
 
 	async componentDidMount() {
@@ -104,24 +106,34 @@ class SurveyBuilder extends React.Component {
 			title: this.state.surveyName,
 		}
 		const cb = this.state.edit
-			? () => fetchJSON(`/api/builder/edit/${this.props.params.match.id}`, newSurvey, 'PUT')
+		// todo: implement PUT
+		// todo: add warning that current responses will be lost and add option to download current data
+			? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
 			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
 		const response = await cb()
 		if (!response.ok) {
-			console.log('o jesus no')
+			M.toast({html: 'There was an error updating the survey'})
 		} else {
-			console.log('we good')
-			const foo = await response.json()
-			console.log({foo})
+			const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
+			M.toast({html: message})
+		}
+	}
+
+	removeOption(idx) {
+		return () => {
+			const questions = cloneDeep(this.state.questions)
+			questions.splice(idx, 1)
+			console.log(questions)
+			this.setState({questions})
 		}
 	}
 
 	renderQuestions() {
 		return this.state.questions.map((props, idx) => (
-			<div className="card">
+			<div className="card" key={props.type + props.questionText + idx}>
 				<div className="card-content">
 					<div className="row">
-						<QuestionBuilder key={props.type + props.questionText + idx} idx={idx + 1} level={1} {...props} />
+						<QuestionBuilder idx={idx + 1} level={1} {...props} edit={this.state.edit} removeOption={this.removeOption(idx)} />
 					</div>
 				</div>
 			</div>
@@ -135,7 +147,7 @@ class SurveyBuilder extends React.Component {
 				<div className="col s12">
 					<div className="row">
 						{/* first row - title */}
-						<form className="col s12">
+						<section className="col s12">
 							<div className="row">
 								<div className="input-field col s12">
 									<input
@@ -143,12 +155,12 @@ class SurveyBuilder extends React.Component {
 										id="survey_title"
 										type="text"
 										className="validate"
-										value={this.surveyName}
+										value={this.state.surveyName}
 										onChange={this.changeTitle}
 									/>
 								</div>
 							</div>
-						</form>
+						</section>
 					</div>
 					<div className="row">
 						{/* next row - questions */}

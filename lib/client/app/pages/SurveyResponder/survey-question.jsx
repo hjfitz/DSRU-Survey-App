@@ -26,6 +26,7 @@ class MultiGroup extends React.Component {
 						<input
 							name={groupID}
 							type="radio"
+							className="with-gap"
 							checked={idx === this.state.selected}
 							value={option.value}
 							data-question-name={this.props.questionText}
