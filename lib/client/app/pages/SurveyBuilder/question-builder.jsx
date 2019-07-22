@@ -1,5 +1,6 @@
 import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
+import M from 'materialize-css'
 
 class QuestionBuilder extends React.Component {
 	constructor(props) {
@@ -18,6 +19,10 @@ class QuestionBuilder extends React.Component {
 		this.addSubquestion = this.addSubquestion.bind(this)
 	}
 
+	componentDidMount() {
+		M.updateTextFields()
+	}
+
 	appendOption() {
 		const options = cloneDeep(this.state.options)
 		options.push({
@@ -32,6 +37,7 @@ class QuestionBuilder extends React.Component {
 		options.pop()
 		this.setState({options})
 	}
+
 
 	addSubquestion(idx) {
 		return () => {
@@ -69,14 +75,16 @@ class QuestionBuilder extends React.Component {
 			<div className="row multi">
 				{this.state.options.map((option, idx) => (
 					<>
-						<div className={`col s12 multi-input-level-${this.props.level}`} key={this.state.questionText + idx}>
+						<div className={`col s12 multi-input-level-${this.props.level} option`} key={this.state.questionText + idx}>
 							<div className="row">
+								<div className="col s12">
+									<h6>{`Option ${idx + 1}: `}</h6>
+								</div>
 								<div className="col s6">
-									{`Option ${idx + 1}: `}
 									<div className="input-field">
 										{/* text inputs for multiple choice answers */}
 										<input
-											placeholder="Response"
+											id={option.value + this.state.questionText}
 											type="text"
 											className="validate question-value"
 											value={option.value || undefined}
@@ -86,18 +94,31 @@ class QuestionBuilder extends React.Component {
 												this.setState({options: opts})
 											}}
 										/>
+										<label htmlFor={option.value + this.state.questionText}>Question Response</label>
 									</div>
 
 								</div>
 
 								<div className="col s6">
-									{`(Optional) Help Text for ${idx + 1}: `}
+									<div className="file-field input-field">
+										<div className="btn right">
+											<span>File</span>
+											<input type="file" />
+										</div>
+										<div className="file-path-wrapper">
+											<input className="file-path validate" type="text" placeholder="Upload an image" />
+										</div>
+									</div>
+								</div>
+
+								<div className="col s12">
+									{/* {`(Optional) Help Text for ${idx + 1}: `} */}
 									<div className="input-field">
 										{/* text inputs for multiple choice answers */}
 										<textarea
-											placeholder="Help Text"
 											type="text"
 											className="materialize-textarea question-help"
+											id={this.state.questionText + option.helpText}
 											value={option.helpText || undefined}
 											onChange={(ev) => {
 												const opts = cloneDeep(this.state.options)
@@ -105,6 +126,7 @@ class QuestionBuilder extends React.Component {
 												this.setState({options: opts})
 											}}
 										/>
+										<label htmlFor={this.state.questionText + option.helpText}>Help Text (Optional)</label>
 									</div>
 								</div>
 							</div>
@@ -139,7 +161,6 @@ class QuestionBuilder extends React.Component {
 
 		return (
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
-
 				<div className="row">
 					<div className="col s12">
 						<i className="material-icons right remove-button" onClick={this.props.removeSubQuestion}>clear</i>

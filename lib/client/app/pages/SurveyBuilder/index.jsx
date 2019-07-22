@@ -77,6 +77,11 @@ class SurveyBuilder extends React.Component {
 		}
 	}
 
+	componentDidUpdate() {
+		const areas = document.querySelectorAll('textarea');
+		[...areas].forEach(area => M.textareaAutoResize(area))
+	}
+
 	changeTitle(ev) {
 		this.setState({
 			surveyName: ev.target.value,
@@ -147,20 +152,18 @@ class SurveyBuilder extends React.Component {
 				<div className="col s12">
 					<div className="row">
 						{/* first row - title */}
-						<section className="col s12">
-							<div className="row">
-								<div className="input-field col s12">
-									<input
-										placeholder="Untitled Survey"
-										id="survey_title"
-										type="text"
-										className="validate"
-										value={this.state.surveyName}
-										onChange={this.changeTitle}
-									/>
-								</div>
-							</div>
+
+						<section className="input-field col s12">
+							<input
+								placeholder="Untitled Survey"
+								id="survey_title"
+								type="text"
+								className="validate"
+								value={this.state.surveyName}
+								onChange={this.changeTitle}
+							/>
 						</section>
+
 					</div>
 					<div className="row">
 						{/* next row - questions */}
