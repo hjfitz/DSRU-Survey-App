@@ -103,7 +103,7 @@ class SurveyBuilder extends React.Component {
 
 	async updateSurvey() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const surveyData = extractAnswers(allQuestions, 1)
+		const surveyData = [...allQuestions].map(elem => extractData(elem, 1))
 		const newSurvey = {
 			questions: surveyData,
 			title: this.state.surveyName,
