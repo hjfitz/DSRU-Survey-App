@@ -147,7 +147,7 @@ class QuestionBuilder extends React.Component {
 												</div>
 											</div>
 										)
-										: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn col s12 m5">Add Sub-question</a>
+										: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn col s12 m6 push-m3">Add Sub-question</a>
 									}
 								</div>
 							</div>

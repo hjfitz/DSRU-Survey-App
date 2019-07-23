@@ -18,6 +18,7 @@ class MultiGroup extends React.Component {
 	}
 
 	componentDidMount() {
+		// todo: move this to index.jsx
 		const range = document.querySelectorAll('input[type="range"]')
 		range.forEach(elem => M.Range.init(elem))
 	}
@@ -60,6 +61,7 @@ class MultiGroup extends React.Component {
 								? <i className="material-icons right cp grey-text" onClick={this.showHelp(option.helpText)}>help_outline</i>
 								: ''
 							}
+							<img className="materialboxed" alt="" src={option.imgPath} />
 						</p>
 						{((idx === this.state.selected) && option.question) ? <Question {...option.question} idx={idx} /> : ''}
 					</React.Fragment>

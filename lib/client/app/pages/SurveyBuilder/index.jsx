@@ -10,9 +10,8 @@ import {fetchJSON} from '../../util'
 function imgToB64(file) {
 	return new Promise((res, rej) => {
 		const reader = new FileReader()
-		reader.addEventListener('load', () => {
-			res(reader.result)
-		}, false)
+		reader.addEventListener('load', () => res(reader.result), false)
+		reader.addEventListener('error', rej)
 		reader.readAsDataURL(file)
 	})
 }
@@ -21,19 +20,24 @@ function resizeImg(dataUrl) {
 	const img = new Image()
 	img.src = dataUrl
 	return new Promise((res, rej) => {
+		img.onerror = rej
 		img.onload = async () => {
 			const {width, height} = img
 			const canvas = document.createElement('canvas')
 			const ctx = canvas.getContext('2d')
-			const scalingFactor = width / 400
-			const newWidth = width / scalingFactor
-			const newHeight = height / scalingFactor
-			canvas.height = newHeight
-			canvas.width = newWidth
-			ctx.drawImage(img, 0, 0, newWidth, newHeight)
-			const newDataUrl = canvas.toDataURL('image/jpeg', 0.8)
-			res(newDataUrl)
-			// this.img = await fetch(newDataUrl).then(r => r.blob())
+			// scale to 1000 if the image is larger
+			if (width > 1000) {
+				const scalingFactor = width / 1000
+				const newWidth = width / scalingFactor
+				const newHeight = height / scalingFactor
+				canvas.height = newHeight
+				canvas.width = newWidth
+				ctx.drawImage(img, 0, 0, newWidth, newHeight)
+				const newDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+				res(newDataUrl)
+			} else {
+				res(dataUrl)
+			}
 		}
 	})
 }
@@ -179,7 +183,7 @@ class SurveyBuilder extends React.Component {
 			} else {
 				const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
 				M.toast({html: message})
-				// this.setState({redir: true})
+				this.setState({redir: true})
 			}
 		}
 	}

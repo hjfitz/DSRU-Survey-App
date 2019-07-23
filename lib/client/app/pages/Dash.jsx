@@ -65,10 +65,11 @@ Do you wish to continue?`
 		}
 		return (
 			<>
-				<h1>Welcome!</h1>
 				<section className="row">
 					<div className="col s12">
-						<Link to="/builder" className="waves-effect waves-light btn">Create a new survey</Link>
+
+						<h1>Welcome!</h1>
+						<h3>You Have {this.state.surveys.length} Ongoing Surveys.</h3>
 					</div>
 				</section>
 				{this.state.surveys.map(survey => (
@@ -91,6 +92,11 @@ Do you wish to continue?`
 						</div>
 					</section>
 				))}
+				<section className="row">
+					<div className="col s12">
+						<Link to="/builder" className="waves-effect waves-light btn">Create a new survey</Link>
+					</div>
+				</section>
 				<Modal text={this.state.modalText} cb={this.state.cb} cbText="Delete" inRef={ref => this.modal = ref} />
 			</>
 		)
