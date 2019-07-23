@@ -5,10 +5,14 @@ const NavBar = () => (
 	<div className="navbar-fixed">
 		<nav>
 			<div className="nav-wrapper white">
-				<a href="#" className="brand-logo black-text">SurveyApp</a>
-				<ul id="nav-mobile" className="right">
-					<li><Link to="/dash" className="black-text">Dashboard</Link></li>
-				</ul>
+				<div className="brand-logo black-text">
+					<img alt="The University of Portsmouth logo" className="h100 p8" src="/ports-logo.png" />
+				</div>
+				<div className="brand-logo right">
+					<Link to="/dash">
+						<img alt="The DSRU Logo" className="h100 p8 right" src="/dsru-logo.png" />
+					</Link>
+				</div>
 			</div>
 		</nav>
 	</div>

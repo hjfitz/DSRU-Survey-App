@@ -72,91 +72,93 @@ class QuestionBuilder extends React.Component {
 			</>
 		)
 		const multi = (
-			<div className="row multi">
-				{this.state.options.map((option, idx) => (
-					<>
-						<div className={`col s12 multi-input-level-${this.props.level} option`} key={this.state.questionText + idx}>
-							<div className="row">
-								<div className="col s12">
-									<h6>{`Option ${idx + 1}: `}</h6>
-								</div>
-								<div className="col s6">
-									<div className="input-field">
-										{/* text inputs for multiple choice answers */}
-										<input
-											id={option.value + this.state.questionText}
-											type="text"
-											className="validate question-value"
-											value={option.value || undefined}
-											onChange={(ev) => {
-												const opts = cloneDeep(this.state.options)
-												opts[idx].value = ev.target.value
-												this.setState({options: opts})
-											}}
-										/>
-										<label htmlFor={option.value + this.state.questionText}>Question Response</label>
+			<>
+				<div className="row multi">
+					{this.state.options.map((option, idx) => (
+						<>
+							<div className={`col s12 multi-input-level-${this.props.level} option`} key={this.state.questionText + idx}>
+								<div className="row">
+									<div className="col s12">
+										<h6>{`Option ${idx + 1}: `}</h6>
 									</div>
-
-								</div>
-
-								<div className="col s6">
-									<div className="file-field input-field">
-										<div className="btn right">
-											<span>File</span>
-											<input type="file" />
+									<div className="col m6 s12">
+										<div className="input-field">
+											{/* text inputs for multiple choice answers */}
+											<input
+												id={option.value + this.state.questionText}
+												type="text"
+												className="validate question-value"
+												value={option.value || undefined}
+												onChange={(ev) => {
+													const opts = cloneDeep(this.state.options)
+													opts[idx].value = ev.target.value
+													this.setState({options: opts})
+												}}
+											/>
+											<label htmlFor={option.value + this.state.questionText}>Question Response</label>
 										</div>
-										<div className="file-path-wrapper">
-											<input className="file-path validate" type="text" placeholder="Upload an image" />
+
+									</div>
+
+									<div className="col m6 s12">
+										<div className="file-field input-field">
+											<div className="btn right">
+												<span>File</span>
+												<input type="file" />
+											</div>
+											<div className="file-path-wrapper">
+												<input className="file-path validate" type="text" placeholder="Upload an image" />
+											</div>
 										</div>
 									</div>
-								</div>
 
-								<div className="col s12">
-									{/* {`(Optional) Help Text for ${idx + 1}: `} */}
-									<div className="input-field">
-										{/* text inputs for multiple choice answers */}
-										<textarea
-											type="text"
-											className="materialize-textarea question-help"
-											id={this.state.questionText + option.helpText}
-											value={option.helpText || undefined}
-											onChange={(ev) => {
-												const opts = cloneDeep(this.state.options)
-												opts[idx].helpText = ev.target.value
-												this.setState({options: opts})
-											}}
-										/>
-										<label htmlFor={this.state.questionText + option.helpText}>Help Text (Optional)</label>
+									<div className="col s12">
+										{/* {`(Optional) Help Text for ${idx + 1}: `} */}
+										<div className="input-field">
+											{/* text inputs for multiple choice answers */}
+											<textarea
+												type="text"
+												className="materialize-textarea question-help"
+												// id={this.state.questionText + option.helpText}
+												value={option.helpText || undefined}
+												onChange={(ev) => {
+													const opts = cloneDeep(this.state.options)
+													opts[idx].helpText = ev.target.value
+													this.setState({options: opts})
+												}}
+											/>
+											<label htmlFor={this.state.questionText + option.helpText}>Help Text (Optional)</label>
+										</div>
 									</div>
+									{/* if there's an existing subquestion, show it. if not, give the option */}
+									{option.question
+										? (
+											<div className="col s12">
+												<div className="card-panel">
+													<div className="row">
+														<QuestionBuilder
+															subText={`Sub-Question for "${this.state.questionText}" (Option: "${option.value}")`}
+															{...option.question}
+															idx={idx + 1}
+															level={this.props.level + 1}
+															removeSubQuestion={this.removeSubQuestion(option._id)}
+														/>
+													</div>
+												</div>
+											</div>
+										)
+										: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn col s12 m5">Add Sub-question</a>
+									}
 								</div>
 							</div>
-							{/* if there's an existing subquestion, show it. if not, give the option */}
-							{option.question
-								? (
-									<div className="card-panel">
-										<div className="row">
-											<QuestionBuilder
-												{...option.question}
-												idx={idx + 1}
-												level={this.props.level + 1}
-												removeSubQuestion={this.removeSubQuestion(option._id)}
-											/>
-										</div>
-									</div>
-								)
-								: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn">Add Sub-question</a>
-							}
-							<hr />
-						</div>
-					</>
-				))}
-				<div className="col s6">
-					<a className="waves-effect waves-light btn green darken-3" onClick={this.appendOption}>Add Option</a>
+						</>
+					))}
 				</div>
-				<div className="col s6">
-					<a className="waves-effect waves-light btn red darken-3" onClick={this.removeOption}>Remove Option</a>
+				<div className="row">
+					<a className="col s12 m4 waves-effect waves-light btn green darken-3" onClick={this.appendOption}>Add Option</a>
+					<a className="col s12 m4 push-m4 waves-effect waves-light btn red darken-3" onClick={this.removeOption}>Remove Option</a>
 				</div>
-			</div>
+			</>
 		)
 
 		return (
@@ -164,9 +166,9 @@ class QuestionBuilder extends React.Component {
 				<div className="row">
 					<div className="col s12">
 						<i className="material-icons right remove-button" onClick={this.props.removeSubQuestion}>clear</i>
-						<h5>Question {this.props.idx}</h5>
+						<h5>{this.props.subText || `Question ${this.props.idx}`}</h5>
 					</div>
-					<div className="col s9">
+					<div className="col m9 s12">
 						Question title:
 						<div className="inline input-field">
 							<input
@@ -178,7 +180,7 @@ class QuestionBuilder extends React.Component {
 							/>
 						</div>
 					</div>
-					<aside className="col s3">
+					<aside className="col m3 s12">
 						Question Type:
 						<p>
 							<label>

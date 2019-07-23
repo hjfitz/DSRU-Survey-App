@@ -1,3 +1,7 @@
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+
+
 import React from 'react'
 import {render} from 'react-dom'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
@@ -9,6 +13,7 @@ import Dashboard from './pages/Dash'
 import SurveyBuilder from './pages/SurveyBuilder'
 import SurveyResponder from './pages/SurveyResponder'
 import Login from './pages/Login'
+import Thanks from './pages/Thanks'
 import Layout from './layout'
 
 const App = () => (
@@ -17,6 +22,7 @@ const App = () => (
 			<Route exact path="/dash" component={Dashboard} />
 			<Route exact path="/builder" component={SurveyBuilder} />
 			<Route exact path="/login" component={Login} />
+			<Route exact path="/thanks" component={Thanks} />
 			<Route path="/respond/:id" component={SurveyResponder} />
 			<Route path="/builder/:id" component={SurveyBuilder} />
 		</Layout>

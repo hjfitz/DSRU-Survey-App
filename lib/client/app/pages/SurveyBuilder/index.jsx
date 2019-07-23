@@ -3,6 +3,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import M from 'materialize-css'
 
 import QuestionBuilder from './question-builder'
+import Modal from '../../partials/modal'
 import {fetchJSON} from '../../util'
 
 function extractData(question, level) {
@@ -58,6 +59,8 @@ class SurveyBuilder extends React.Component {
 		this.appendQuestion = this.appendQuestion.bind(this)
 		this.removeLastQuestion = this.removeLastQuestion.bind(this)
 		this.removeQuestion = this.removeQuestion.bind(this)
+		this.updateSurvey = this.updateSurvey.bind(this)
+		// this.createSurvey = this.createSurvey.bind
 	}
 
 	async componentDidMount() {
@@ -103,6 +106,22 @@ class SurveyBuilder extends React.Component {
 		this.setState({questions})
 	}
 
+	async updateSurvey() {
+		const allQuestions = document.querySelectorAll('.question-builder.level-1')
+		const surveyData = extractAnswers(allQuestions, 1)
+		const newSurvey = {
+			questions: surveyData,
+			title: this.state.surveyName,
+		}
+		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put')
+		if (resp.ok) {
+			M.toast({html: 'Successfully updated survey'})
+		} else {
+			const {message} = await resp.json()
+			M.toast({html: `There was an error updating: ${message}`})
+		}
+	}
+
 	async fetchData() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
 		const surveyData = extractAnswers(allQuestions, 1)
@@ -110,16 +129,20 @@ class SurveyBuilder extends React.Component {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		const cb = this.state.edit
 		// todo: add warning that current responses will be lost and add option to download current data
-			? () => fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'PUT')
-			: () => fetchJSON('/api/builder/new', newSurvey, 'POST')
-		const response = await cb()
-		if (!response.ok) {
-			M.toast({html: 'There was an error updating the survey'})
+		if (this.state.edit) {
+			const inst = M.Modal.init(this.modal)
+			inst.open()
 		} else {
-			const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
-			M.toast({html: message})
+			const cb = fetchJSON('/api/builder/new', newSurvey, 'POST')
+
+			const response = await cb()
+			if (!response.ok) {
+				M.toast({html: 'There was an error updating the survey'})
+			} else {
+				const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
+				M.toast({html: message})
+			}
 		}
 	}
 
@@ -147,6 +170,11 @@ class SurveyBuilder extends React.Component {
 
 
 	render() {
+		const modalText = `# Warning
+Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**. 
+		
+You can <a href="/api/builder/csv/${this.props.match.params.id}.csv" download>download the dataset here before doing this.</a>`
+
 		return (
 			<div className="row">
 				<div className="col s12">
@@ -171,23 +199,25 @@ class SurveyBuilder extends React.Component {
 					</div>
 					<div className="row">
 						{/* final row, question setup */}
-						<div className="col s4">
-							<a className="waves-effect waves-light btn green" onClick={this.appendQuestion}>
+						<a className="col s12 m4 waves-effect waves-light btn green" onClick={this.appendQuestion}>
 								Add Question
-							</a>
-						</div>
-						<div className="col s4">
-							<a className="waves-effect waves-light btn red" onClick={this.removeLastQuestion}>
+						</a>
+						<a className="col s12 m4 push-m4 waves-effect waves-light btn red" onClick={this.removeLastQuestion}>
 								Remove Question
-							</a>
-						</div>
-						<div className="col s4">
-							<a className="waves-effect waves-light btn" onClick={this.fetchData}>
-								Save and Submit
-							</a>
-						</div>
+						</a>
+					</div>
+					<div className="row">
+						<a className="col s12 waves-effect waves-light btn" onClick={this.fetchData}>
+							{this.state.edit ? 'Save and Update Survey' : 'Create Survey'}
+						</a>
 					</div>
 				</div>
+				<Modal
+					inRef={ref => this.modal = ref}
+					cbText="Continue"
+					cb={this.updateSurvey}
+					text={modalText}
+				/>
 			</div>
 		)
 	}
