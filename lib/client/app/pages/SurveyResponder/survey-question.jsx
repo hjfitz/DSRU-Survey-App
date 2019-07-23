@@ -4,7 +4,6 @@ import M from 'materialize-css'
 
 import Modal from '../../partials/modal'
 
-// todo: move this to a functional component with hooks?
 class MultiGroup extends React.Component {
 	constructor(props) {
 		super(props)

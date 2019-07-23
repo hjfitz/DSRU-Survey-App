@@ -38,10 +38,7 @@ class Login extends React.Component {
 	render() {
 		if (this.state.redir) {
 			const urlParams = new URLSearchParams(window.location.search)
-			if (urlParams.has('prev')) {
-				console.log(decodeURIComponent(urlParams.get('prev')))
-				return <Redirect to={decodeURIComponent(urlParams.get('prev'))} />
-			}
+			if (urlParams.has('prev')) return <Redirect to={decodeURIComponent(urlParams.get('prev'))} />
 			return <Redirect to="/dash" />
 		}
 		return (

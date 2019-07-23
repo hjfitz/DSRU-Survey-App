@@ -3,7 +3,6 @@ import React from 'react'
 const Thanks = () => {
 	const params = new URLSearchParams(window.location.search)
 	let completed = 'the survey'
-	console.log(params)
 	if (params.has('title')) {
 		completed = decodeURIComponent(params.get('title'))
 	}

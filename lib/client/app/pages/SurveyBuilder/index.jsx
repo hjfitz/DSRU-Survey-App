@@ -1,6 +1,7 @@
 import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 import M from 'materialize-css'
+import {Redirect} from 'react-router-dom'
 
 import QuestionBuilder from './question-builder'
 import Modal from '../../partials/modal'
@@ -39,12 +40,6 @@ function extractData(question, level) {
 		ds.maxVal = parseInt(scalarInput.value, 10)
 	}
 	return ds
-}
-
-// todo: merge this with fetchData()
-function extractAnswers(elems, level) {
-	const dataset = [...elems].map(elem => extractData(elem, level))
-	return dataset
 }
 
 class SurveyBuilder extends React.Component {
@@ -116,6 +111,7 @@ class SurveyBuilder extends React.Component {
 		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put')
 		if (resp.ok) {
 			M.toast({html: 'Successfully updated survey'})
+			this.setState({redir: true})
 		} else {
 			const {message} = await resp.json()
 			M.toast({html: `There was an error updating: ${message}`})
@@ -124,34 +120,30 @@ class SurveyBuilder extends React.Component {
 
 	async fetchData() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const surveyData = extractAnswers(allQuestions, 1)
+		const surveyData = [...allQuestions].map(elem => extractData(elem, 1))
 		const newSurvey = {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		// todo: add warning that current responses will be lost and add option to download current data
 		if (this.state.edit) {
 			const inst = M.Modal.init(this.modal)
 			inst.open()
 		} else {
-			const cb = fetchJSON('/api/builder/new', newSurvey, 'POST')
-
-			const response = await cb()
+			const response = await fetchJSON('/api/builder/new', newSurvey, 'POST')
 			if (!response.ok) {
 				M.toast({html: 'There was an error updating the survey'})
 			} else {
 				const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
 				M.toast({html: message})
+				this.setState({redir: true})
 			}
 		}
 	}
 
-	// todo: merge this in to removeQuestion
 	removeQuestion(idx) {
 		return () => {
 			const questions = cloneDeep(this.state.questions)
 			questions.splice(idx, 1)
-			console.log(questions)
 			this.setState({questions})
 		}
 	}
@@ -161,7 +153,14 @@ class SurveyBuilder extends React.Component {
 			<div className="card" key={props.type + props.questionText + idx}>
 				<div className="card-content">
 					<div className="row">
-						<QuestionBuilder idx={idx + 1} level={1} {...props} edit={this.state.edit} removeSubQuestion={this.removeQuestion(idx)} />
+						<QuestionBuilder
+							idx={idx + 1}
+							origQuestion={idx + 1}
+							level={1}
+							{...props}
+							edit={this.state.edit}
+							removeSubQuestion={this.removeQuestion(idx)}
+						/>
 					</div>
 				</div>
 			</div>
@@ -170,6 +169,7 @@ class SurveyBuilder extends React.Component {
 
 
 	render() {
+		if (this.state.redir) return <Redirect to="/dash" />
 		const modalText = `# Warning
 Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**. 
 		

@@ -5,7 +5,7 @@ const NavBar = () => (
 	<div className="navbar-fixed">
 		<nav>
 			<div className="nav-wrapper white">
-				<div className="brand-logo black-text">
+				<div className="brand-logo left">
 					<img alt="The University of Portsmouth logo" className="h100 p8" src="/ports-logo.png" />
 				</div>
 				<div className="brand-logo right">

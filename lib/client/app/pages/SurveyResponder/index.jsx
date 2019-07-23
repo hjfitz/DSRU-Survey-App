@@ -36,7 +36,6 @@ function recurAndGetQuestions(question, prev = '') {
 		}
 	}
 
-	// todo: for questionText, append previous question title
 	if (question.options) {
 		ds.push(
 			question.options
@@ -78,7 +77,6 @@ class SurveyResponder extends React.Component {
 		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
 		if (resp.ok) {
 			M.toast({html: 'Successfully saved result'})
-			// todo: redirect to a thankyou page
 			this.setState({redir: true})
 		} else {
 			M.toast({html: 'There was an error submitting your response'})

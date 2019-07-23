@@ -75,8 +75,8 @@ class QuestionBuilder extends React.Component {
 			<>
 				<div className="row multi">
 					{this.state.options.map((option, idx) => (
-						<>
-							<div className={`col s12 multi-input-level-${this.props.level} option`} key={this.state.questionText + idx}>
+						<React.Fragment key={this.state.questionText + idx}>
+							<div className={`col s12 multi-input-level-${this.props.level} option`}>
 								<div className="row">
 									<div className="col s12">
 										<h6>{`Option ${idx + 1}: `}</h6>
@@ -137,7 +137,7 @@ class QuestionBuilder extends React.Component {
 												<div className="card-panel">
 													<div className="row">
 														<QuestionBuilder
-															subText={`Sub-Question for "${this.state.questionText}" (Option: "${option.value}")`}
+															subText={`Sub-Question for "${this.state.questionText || 'No question given'}" (Option: "${option.value || 'No option set'}")`}
 															{...option.question}
 															idx={idx + 1}
 															level={this.props.level + 1}
@@ -151,7 +151,7 @@ class QuestionBuilder extends React.Component {
 									}
 								</div>
 							</div>
-						</>
+						</React.Fragment>
 					))}
 				</div>
 				<div className="row">
@@ -177,6 +177,9 @@ class QuestionBuilder extends React.Component {
 								value={this.state.questionText}
 								type="text"
 								className="validate question-title"
+								onChange={(ev) => {
+									this.setState({questionText: ev.target.value})
+								}}
 							/>
 						</div>
 					</div>
