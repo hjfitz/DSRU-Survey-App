@@ -45,6 +45,8 @@ class MultiGroup extends React.Component {
 						<p>
 							<label onClick={this.setSelected(idx)} data-question-group>
 								<input
+								// todo: images are in state. In order to display these, just show an image. Maybe add a check to change the stacking of the buttons
+								// todo: put the images in a modal thingy
 									name={this.state.groupID}
 									type="radio"
 									className="with-gap"

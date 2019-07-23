@@ -104,7 +104,7 @@ class QuestionBuilder extends React.Component {
 										<div className="file-field input-field">
 											<div className="btn right">
 												<span>File</span>
-												<input type="file" />
+												<input type="file" accept="image/png, image/jpeg, image/jpg" className="question-img" />
 											</div>
 											<div className="file-path-wrapper">
 												<input className="file-path validate" type="text" placeholder="Upload an image" />

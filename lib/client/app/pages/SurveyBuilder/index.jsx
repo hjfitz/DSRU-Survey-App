@@ -7,7 +7,38 @@ import QuestionBuilder from './question-builder'
 import Modal from '../../partials/modal'
 import {fetchJSON} from '../../util'
 
-function extractData(question, level) {
+function imgToB64(file) {
+	return new Promise((res, rej) => {
+		const reader = new FileReader()
+		reader.addEventListener('load', () => {
+			res(reader.result)
+		}, false)
+		reader.readAsDataURL(file)
+	})
+}
+
+function resizeImg(dataUrl) {
+	const img = new Image()
+	img.src = dataUrl
+	return new Promise((res, rej) => {
+		img.onload = async () => {
+			const {width, height} = img
+			const canvas = document.createElement('canvas')
+			const ctx = canvas.getContext('2d')
+			const scalingFactor = width / 400
+			const newWidth = width / scalingFactor
+			const newHeight = height / scalingFactor
+			canvas.height = newHeight
+			canvas.width = newWidth
+			ctx.drawImage(img, 0, 0, newWidth, newHeight)
+			const newDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+			res(newDataUrl)
+			// this.img = await fetch(newDataUrl).then(r => r.blob())
+		}
+	})
+}
+
+async function extractData(question, level) {
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
 	const {questionType: type} = question.dataset
@@ -22,17 +53,25 @@ function extractData(question, level) {
 		const optsDOM = question.querySelectorAll(`.multi-input-level-${level}`)
 		// if there are options, add them
 		if (optsDOM && optsDOM.length) {
-			const options = [...optsDOM].map((option) => {
+			const options = await Promise.all([...optsDOM].map(async (option) => {
 				const {value} = option.querySelector('input.question-value')
 				const {value: helpText} = option.querySelector('textarea.question-help')
 				const optDS = {value, helpText}
+				try {
+					const {files: [file]} = option.querySelector('input.question-img')
+					const dataUrl = await imgToB64(file)
+					const imgResized = await resizeImg(dataUrl)
+					optDS.imgUrl = imgResized
+				} catch (err) {
+					console.warn(err)
+				}
 				const subQuestion = option.querySelector(`.question-builder.level-${level + 1}`)
 				if (subQuestion) {
 					// recur if there's a lower level
-					optDS.question = extractData(subQuestion, level + 1)
+					optDS.question = await extractData(subQuestion, level + 1)
 				}
 				return optDS
-			})
+			}))
 			ds.options = options
 		}
 	} else {
@@ -105,7 +144,7 @@ class SurveyBuilder extends React.Component {
 
 	async updateSurvey() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const surveyData = [...allQuestions].map(elem => extractData(elem, 1))
+		const surveyData = await Promise.all([...allQuestions].map(elem => extractData(elem, 1)))
 		const newSurvey = {
 			questions: surveyData,
 			title: this.state.surveyName,
@@ -122,7 +161,7 @@ class SurveyBuilder extends React.Component {
 
 	async fetchData() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const surveyData = [...allQuestions].map(elem => extractData(elem, 1))
+		const surveyData = await Promise.all([...allQuestions].map(elem => extractData(elem, 1)))
 		const newSurvey = {
 			questions: surveyData,
 			title: this.state.surveyName,
@@ -140,7 +179,7 @@ class SurveyBuilder extends React.Component {
 			} else {
 				const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
 				M.toast({html: message})
-				this.setState({redir: true})
+				// this.setState({redir: true})
 			}
 		}
 	}
