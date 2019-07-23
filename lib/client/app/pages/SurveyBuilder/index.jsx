@@ -72,6 +72,8 @@ class SurveyBuilder extends React.Component {
 					edit: true,
 				})
 			}
+		} else {
+			// fetch the data from localStorage. Follow the usual schema
 		}
 	}
 
@@ -108,7 +110,7 @@ class SurveyBuilder extends React.Component {
 			questions: surveyData,
 			title: this.state.surveyName,
 		}
-		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put')
+		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put').catch(console.log)
 		if (resp.ok) {
 			M.toast({html: 'Successfully updated survey'})
 			this.setState({redir: true})
@@ -129,9 +131,12 @@ class SurveyBuilder extends React.Component {
 			const inst = M.Modal.init(this.modal)
 			inst.open()
 		} else {
-			const response = await fetchJSON('/api/builder/new', newSurvey, 'POST')
-			if (!response.ok) {
-				M.toast({html: 'There was an error updating the survey'})
+			const resp = await fetchJSON('/api/builder/new', newSurvey, 'POST')
+			if (!resp.ok) {
+				// user is unauthorised
+				if (resp.status === 401) {
+					this.setState({redir: true})
+				}
 			} else {
 				const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
 				M.toast({html: message})
@@ -171,8 +176,8 @@ class SurveyBuilder extends React.Component {
 	render() {
 		if (this.state.redir) return <Redirect to="/dash" />
 		const modalText = `# Warning
-Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**. 
-		
+Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**.
+
 You can <a href="/api/builder/csv/${this.props.match.params.id}.csv" download>download the dataset here before doing this.</a>`
 
 		return (

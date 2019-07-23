@@ -7,9 +7,11 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "parcel lib/client/index.html --out-dir build --no-hmr",
+    "dev:client": "parcel lib/client/index.html --out-dir build --no-hmr",
     "start": "node lib/server",
-    "dev": "nodemon lib/server"
+	"dev:server": "nodemon lib/server",
+	"dev": "concurrently --kill-others \"npm run dev:client\" \"npm run dev:server\""
+
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
@@ -19,6 +21,7 @@
     "@babel/preset-env": "^7.5.0",
     "babel": "^6.23.0",
     "babel-loader": "^8.0.6",
+    "concurrently": "^4.1.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-config-airbnb-base": "^13.2.0",

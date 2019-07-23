@@ -28,7 +28,7 @@ class Dash extends React.Component {
 			const surveys = await resp.json()
 			this.setState({surveys})
 		} else {
-			M.toast({html: 'You need to login to view the dashboard'})
+			M.toast({html: 'You need to login to do this'})
 			this.setState({redir: true})
 		}
 	}

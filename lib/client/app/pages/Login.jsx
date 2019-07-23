@@ -63,9 +63,9 @@ class Login extends React.Component {
 								</div>
 							</div>
 							<div className="row">
-								<div className="col m6 push-m3 s12">
-									<a className="waves-effect waves-light btn" onClick={this.login}><i className="material-icons right">cloud</i>Login</a>
-								</div>
+								<a className="waves-effect waves-light btn col m6 push-m3 s12" onClick={this.login}>
+									<i className="material-icons left">person_pin</i>Login
+								</a>
 							</div>
 						</div>
 					</div>
