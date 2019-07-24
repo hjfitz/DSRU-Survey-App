@@ -17,31 +17,40 @@ class Dash extends React.Component {
 		super(props)
 		this.state = {
 			surveys: [],
+			page: 1,
 			redir: false,
 			modalText: 'Should not see this',
 		}
+		this.renderPaginator = this.renderPaginator.bind(this)
 	}
 
-	async componentDidMount() {
-		const resp = await fetchJSON('/api/builder/all')
+	componentDidMount() {
+		this.fetchSurveyData()
+	}
+
+	componentDidUpdate() {
+		// this.fetchSurveyData()
+	}
+
+	async fetchSurveyData() {
+		const resp = await fetchJSON(`/api/builder/all?page=${this.state.page}`)
 		if (resp.ok) {
-			const surveys = await resp.json()
-			this.setState({surveys})
+			const dashData = await resp.json()
+			this.setState(dashData)
 		} else {
 			M.toast({html: 'You need to login to do this'})
 			this.setState({redir: true})
 		}
 	}
 
+
 	deleteSurvey(id, title) {
 		return () => {
 			const cb = async () => {
-				const resp = await fetchJSON(`/api/builder/${id}`, {}, 'delete')
+				const resp = await fetchJSON(`/api/builder/${id}?page=${this.state.page}`, {}, 'delete')
 				if (resp.ok) {
-					const surveys = await resp.json()
-					this.setState({surveys}, () => {
-						M.toast({html: `Deleted "${title}"`})
-					})
+					await this.fetchSurveyData()
+					M.toast({html: `Deleted "${title}"`})
 				}
 			}
 
@@ -57,6 +66,31 @@ Do you wish to continue?`
 				inst.open()
 			})
 		}
+	}
+
+	renderPaginator() {
+		const maxPages = Math.ceil(this.state.count / 10)
+		if (maxPages === 1) return ''
+		const cb = page => this.setState({page}, this.fetchSurveyData)
+		const inner = Array.from({length: maxPages}).map((_, idx) => {
+			const curNo = idx + 1
+			const className = curNo === this.state.page ? 'active teal' : 'waves-effect'
+			return <li key={curNo} className={className} onClick={() => cb(curNo)}><a href="#!">{curNo}</a></li>
+		})
+		const firstChevClass = this.state.page === 1 ? 'disabled' : 'waves-effect'
+		const firstChevCallback = this.state.page === 1 ? () => {} : () => cb(this.state.page - 1)
+		const lastChevClass = this.state.page === maxPages ? 'disabled' : 'waves-effect'
+		const lastChevCallback = this.state.page === maxPages ? () => {} : () => cb(this.state.page + 1)
+		const firstChev = <li className={firstChevClass} onClick={firstChevCallback}><a href="#!"><i className="material-icons">chevron_left</i></a></li>
+		const lastChev = <li className={lastChevClass} onClick={lastChevCallback}><a href="#!"><i className="material-icons">chevron_right</i></a></li>
+		const paginator = (
+			<ul className="pagination center-align">
+				{firstChev}
+				{inner}
+				{lastChev}
+			</ul>
+		)
+		return paginator
 	}
 
 	render() {
@@ -91,6 +125,11 @@ Do you wish to continue?`
 						</div>
 					</section>
 				))}
+				<div className="row">
+					<div className="col s12">
+						{this.renderPaginator()}
+					</div>
+				</div>
 				<Modal text={this.state.modalText} cb={this.state.cb} cbText="Delete" inRef={ref => this.modal = ref} />
 			</>
 		)
