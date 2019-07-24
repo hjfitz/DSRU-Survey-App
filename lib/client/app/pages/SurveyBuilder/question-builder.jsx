@@ -216,8 +216,9 @@ class QuestionBuilder extends React.Component {
 									type="checkbox"
 									defaultChecked={this.state.required}
 									checked={this.state.required}
-									onChange={(ev) => {
-										console.log(ev.target.value)
+									className="question-required"
+									onChange={() => {
+										this.setState({required: !this.state.required})
 									}}
 								/>
 								<span>Required</span>

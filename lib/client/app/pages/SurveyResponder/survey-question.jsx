@@ -100,7 +100,7 @@ class Question extends React.Component {
 			<section className="card">
 				<div className="card-content">
 					<span className="card-title">{props.idx + 1}) {props.questionText}</span>
-					<div data-question-name={props.questionText} data-question-type={questionType}>
+					<div data-question-name={props.questionText} data-question-type={questionType} data-required={props.required}>
 						{inner}
 					</div>
 				</div>
