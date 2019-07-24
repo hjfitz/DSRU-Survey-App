@@ -10,10 +10,10 @@ class QuestionBuilder extends React.Component {
 			questionText: props.questionText,
 			options: props.options || [],
 			maxVal: props.maxVal || 5,
+			required: props.required || true,
 		}
 		this.questionText = React.createRef()
 		this.subQuestions = []
-
 		this.appendOption = this.appendOption.bind(this)
 		this.removeOption = this.removeOption.bind(this)
 		this.addSubquestion = this.addSubquestion.bind(this)
@@ -168,6 +168,7 @@ class QuestionBuilder extends React.Component {
 						<i className="material-icons right remove-button" onClick={this.props.removeSubQuestion}>clear</i>
 						<h5>{this.props.subText || `Question ${this.props.idx}`}</h5>
 					</div>
+					<div className="col s12" />
 					<div className="col m9 s12">
 						Question title:
 						<div className="inline input-field">
@@ -207,6 +208,19 @@ class QuestionBuilder extends React.Component {
 									onClick={() => this.setState({type: 'scalar'})}
 								/>
 								<span>Scalar</span>
+							</label>
+						</p>
+						<p className="required-toggle">
+							<label>
+								<input
+									type="checkbox"
+									defaultChecked={this.state.required}
+									checked={this.state.required}
+									onChange={(ev) => {
+										console.log(ev.target.value)
+									}}
+								/>
+								<span>Required</span>
 							</label>
 						</p>
 					</aside>
