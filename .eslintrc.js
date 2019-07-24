@@ -6,10 +6,11 @@ module.exports = {
 		"node": true,
 	},
 	"rules": {
-		"indent": ["error", "tab"],
-		"semi": ["error", "never"],
-		"camelcase": 0,
 		"max-len": ["error", { "code": 160 }],
+		"implicit-arrow-linebreak": 0,
+		"semi": ["error", "never"],
+		"indent": ["error", "tab"],
+		"camelcase": 0,
 
 		"no-underscore-dangle": 0,
 		"no-param-reassign": 0,
