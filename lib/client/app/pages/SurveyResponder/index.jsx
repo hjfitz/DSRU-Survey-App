@@ -5,14 +5,15 @@ import {Redirect} from 'react-router-dom'
 
 import {fetchJSON} from '../../util'
 import Question from './survey-question'
+import Modal from '../../partials/modal'
 
 
 function recurAndGetQuestions(question, prev = '') {
 	const {questionText} = question
 
 	const elem = document.querySelector(`div[data-question-name="${questionText}"]`)
-
 	const ret = {questionText: prev + questionText, value: 'No response'}
+
 	const ds = [ret]
 	const selector = `input[data-question-name="${questionText}"]`
 	// no element? user has not unihdden the correct option
@@ -21,30 +22,43 @@ function recurAndGetQuestions(question, prev = '') {
 	}
 	// multi choice
 	if (elem) {
+		// find parent elem
+		const parent = elem.parentElement.parentElement
+		parent.classList.remove('invalid-response')
+
+		const {required} = elem.dataset
 		if (elem.dataset.questionType === 'multi') {
 			// get all checkboxes and find the selected one.
 			const checkboxes = elem.querySelectorAll(selector)
 			const [selectedCheck] = [...checkboxes].filter(box => box.checked)
-			if (selectedCheck) ret.value = selectedCheck.value
+			if (selectedCheck) {
+				ret.value = selectedCheck.value
+			// unselected and is required? uh oh
+			} else if (required === 'true') {
+				// colour the element
+				parent.classList.add('invalid-response')
+				return false
+			}
 			// recur if necessary for all questions with an 'option' (subquestion)
 
 			// scalar - find the scalar input and pick it's value
 		} else if (elem.dataset.questionType === 'scalar') {
 			// do this
 			const inp = elem.querySelector(selector)
-			ret.value = inp.value
+			ret.value = inp.value || 'Not found on form'
 		}
-	}
 
-	if (question.options) {
-		ds.push(
-			question.options
-				.filter(option => option.question)
-				.map(option => recurAndGetQuestions(option.question, `${questionText} (${option.value}) > `)),
-			// for without a prefix
-			// .map(option => recurAndGetQuestions(option.question)),
 
-		)
+		if (question.options) {
+			ds.push(
+				question.options
+					.filter(option => option.question)
+					.map(option => recurAndGetQuestions(option.question, `${questionText} (${option.value}) > `)),
+				// for without a prefix
+				// .map(option => recurAndGetQuestions(option.question)),
+
+			)
+		}
 	}
 
 	return ds
@@ -74,10 +88,16 @@ class SurveyResponder extends React.Component {
 	async respond(ev) {
 		ev.preventDefault()
 		const questionsAndAnswers = flattenDeep(this.state.questions.map(qu => recurAndGetQuestions(qu)))
+		const isValidResponse = questionsAndAnswers.reduce((acc, cur) => cur && acc, true)
+		if (!isValidResponse) {
+			const inst = M.Modal.init(this.modal)
+			inst.open()
+			return
+		}
 		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
 		if (resp.ok) {
 			M.toast({html: 'Successfully saved result'})
-			this.setState({redir: true})
+			// this.setState({redir: true})
 		} else {
 			M.toast({html: 'There was an error submitting your response'})
 		}
@@ -94,6 +114,15 @@ class SurveyResponder extends React.Component {
 					Submit your response <i className="material-icons right">send</i>
 					</a>
 				</div>
+				<Modal
+					inRef={ref => this.modal = ref}
+					text={`##### There Was a Problem Saving Your Results!
+
+Please ensure that you respond to every required question.
+
+Missing questions are outlined in red.
+				`}
+				/>
 			</div>
 
 

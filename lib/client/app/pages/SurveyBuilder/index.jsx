@@ -11,10 +11,11 @@ function extractData(question, level) {
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
 	const {questionType: type} = question.dataset
+	const {checked: required} = question.querySelector('input.question-required')
 
 	// create a dataset to return
 	// should be of form: {questionText, type, [options]} or {questionText, type, maxVal}
-	const ds = {questionText, type}
+	const ds = {questionText, type, required}
 
 	// fetch and recur
 	if (type === 'multi') {
