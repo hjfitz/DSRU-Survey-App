@@ -7,70 +7,7 @@ import {fetchJSON} from '../../util'
 import Question from './survey-question'
 import Modal from '../../partials/modal'
 import Markdown from '../../partials/markdown'
-
-
-function recurAndGetQuestions(question, prev = '') {
-	const {questionText, _id: id} = question
-
-	const elem = document.querySelector(`div[data-question-id="${id}"]`)
-	const ret = {questionText: `${prev + questionText} (id: ${id})`, value: 'No response'}
-
-	const ds = [ret]
-	const selector = `input[data-question-id="${id}"]`
-	// no element? user has not unihdden the correct option
-	if (!elem) {
-		ret.value = 'Not found on form'
-	}
-	// multi choice
-	if (elem) {
-		// find parent elem
-		const parent = elem.parentElement.parentElement
-		parent.classList.remove('invalid-response')
-
-		const {required} = elem.dataset
-		if (elem.dataset.questionType === 'multi') {
-			// get all checkboxes and find the selected one.
-			const checkboxes = elem.querySelectorAll(selector)
-			const [selectedCheck] = [...checkboxes].filter(box => box.checked)
-			if (selectedCheck) {
-				ret.value = selectedCheck.value
-			// unselected and is required? uh oh
-			} else if (required === 'true') {
-				// colour the element
-				parent.classList.add('invalid-response')
-				return false
-			}
-			// recur if necessary for all questions with an 'option' (subquestion)
-
-			// scalar - find the scalar input and pick it's value
-		} else if (elem.dataset.questionType === 'scalar') {
-			// do this
-			const inp = elem.querySelector(selector)
-			ret.value = inp.value || 'Not found on form'
-		} else if (elem.dataset.questionType === 'open') {
-			const inp = elem.querySelector(selector.replace('input', 'textarea'))
-			ret.value = inp.value
-			if (!inp.value) {
-				parent.classList.add('invalid-response')
-				return false
-			}
-		}
-
-
-		if (question.options) {
-			ds.push(
-				question.options
-					.filter(option => option.question)
-					.map(option => recurAndGetQuestions(option.question, `${questionText} (${option.value}) > `)),
-				// for without a prefix
-				// .map(option => recurAndGetQuestions(option.question)),
-
-			)
-		}
-	}
-
-	return ds
-}
+import recurAndGetQuestions from './fetch-data'
 
 class SurveyResponder extends React.Component {
 	constructor(props) {
