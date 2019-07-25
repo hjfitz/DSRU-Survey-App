@@ -13,8 +13,7 @@ class QuestionBuilder extends React.Component {
 			// used as we want to declare it as false and otherwise return true
 			// mongo questions in edit mode have 'false' as a required option
 			// however, undefined is falsey and we wish for *new* questions to default to true
-			// eslint-disable-next-line no-unneeded-ternary
-			required: (props.required === false) ? false : true,
+			required: props.required !== false,
 		}
 		this.questionText = React.createRef()
 		this.subQuestions = []

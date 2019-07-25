@@ -67,7 +67,6 @@ class SurveyBuilder extends React.Component {
 			const resp = await fetchJSON(`/api/builder/edit/${id}`)
 			if (resp.ok) {
 				const {questions, title} = await resp.json()
-				console.log(questions)
 				this.setState({
 					questions,
 					surveyName: title,

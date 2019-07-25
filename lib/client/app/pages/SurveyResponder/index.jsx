@@ -33,13 +33,11 @@ function recurAndGetQuestions(question, prev = '') {
 			const [selectedCheck] = [...checkboxes].filter(box => box.checked)
 			if (selectedCheck) {
 				ret.value = selectedCheck.value
-			} else {
-				const isRequired = (required === 'true')
-				if (isRequired) {
-					// colour the element
-					parent.classList.add('invalid-response')
-					return false
-				}
+			// unselected and is required? uh oh
+			} else if (required === 'true') {
+				// colour the element
+				parent.classList.add('invalid-response')
+				return false
 			}
 			// recur if necessary for all questions with an 'option' (subquestion)
 
