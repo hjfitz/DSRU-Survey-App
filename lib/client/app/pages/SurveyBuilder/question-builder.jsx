@@ -169,7 +169,7 @@ class QuestionBuilder extends React.Component {
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
 				<div className="row">
 					<div className="col s12">
-						<i className="material-icons right remove-button" onClick={this.props.removeSubQuestion}>clear</i>
+						<i className="material-icons right remove-button cp" onClick={this.props.removeSubQuestion}>clear</i>
 						<h5>{this.props.subText || `Question ${this.props.idx}`}</h5>
 					</div>
 					<div className="col s12" />

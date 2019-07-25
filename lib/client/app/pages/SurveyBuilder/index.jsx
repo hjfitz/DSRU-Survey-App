@@ -49,6 +49,7 @@ class SurveyBuilder extends React.Component {
 		this.state = {
 			questions: [],
 			surveyName: '',
+			introText: '',
 		}
 		this.fetchData = this.fetchData.bind(this)
 		this.changeTitle = this.changeTitle.bind(this)
@@ -56,6 +57,7 @@ class SurveyBuilder extends React.Component {
 		this.removeLastQuestion = this.removeLastQuestion.bind(this)
 		this.removeQuestion = this.removeQuestion.bind(this)
 		this.updateSurvey = this.updateSurvey.bind(this)
+		this.changeIntroText = this.changeIntroText.bind(this)
 		// this.createSurvey = this.createSurvey.bind
 	}
 
@@ -66,11 +68,12 @@ class SurveyBuilder extends React.Component {
 			// we're in edit mode. fetch the survey data and populate
 			const resp = await fetchJSON(`/api/builder/edit/${id}`)
 			if (resp.ok) {
-				const {questions, title} = await resp.json()
+				const {questions, title, introText} = await resp.json()
 				this.setState({
 					questions,
 					surveyName: title,
 					edit: true,
+					introText,
 				})
 			}
 		} else {
@@ -84,9 +87,11 @@ class SurveyBuilder extends React.Component {
 	}
 
 	changeTitle(ev) {
-		this.setState({
-			surveyName: ev.target.value,
-		})
+		this.setState({surveyName: ev.target.value})
+	}
+
+	changeIntroText(ev) {
+		this.setState({introText: ev.target.value})
 	}
 
 	appendQuestion() {
@@ -110,6 +115,7 @@ class SurveyBuilder extends React.Component {
 		const newSurvey = {
 			questions: surveyData,
 			title: this.state.surveyName,
+			introText: this.state.introText,
 		}
 		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put').catch(console.log)
 		if (resp.ok) {
@@ -127,6 +133,7 @@ class SurveyBuilder extends React.Component {
 		const newSurvey = {
 			questions: surveyData,
 			title: this.state.surveyName,
+			introText: this.state.introText,
 		}
 		if (this.state.edit) {
 			const inst = M.Modal.init(this.modal)
@@ -185,22 +192,39 @@ You can <a href="/api/builder/csv/${this.props.match.params.id}.csv" download>do
 			<div className="row">
 				<div className="col s12">
 					<div className="row">
-						{/* first row - title */}
 
-						<section className="input-field col s12">
-							<input
-								placeholder="Untitled Survey"
-								id="survey_title"
-								type="text"
-								className="validate"
-								value={this.state.surveyName}
-								onChange={this.changeTitle}
-							/>
-						</section>
+						<div className="card">
+							<div className="card-content">
+								{/* first row - title and intro */}
+								<div className="row">
+									<h5 className="col c12">Survey Information</h5>
+									<section className="input-field col s12">
+										<input
+											placeholder="Untitled Survey"
+											id="survey_title"
+											type="text"
+											className="validate"
+											value={this.state.surveyName}
+											onChange={this.changeTitle}
+										/>
+										<label htmlFor="survey_title" className="active">Survey Title</label>
+									</section>
 
+									<div className="input-field col s12">
+										<textarea
+											value={this.state.introText}
+											onChange={this.changeIntroText}
+											id="intro-text"
+											className="materialize-textarea"
+										/>
+										<label htmlFor="intro-text">Intro text</label>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 					<div className="row">
-						{/* next row - questions */}
+						{/* row - questions */}
 						{this.renderQuestions()}
 					</div>
 					<div className="row">
