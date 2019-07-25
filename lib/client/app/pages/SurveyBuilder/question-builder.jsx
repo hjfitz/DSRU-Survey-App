@@ -164,6 +164,10 @@ class QuestionBuilder extends React.Component {
 			</>
 		)
 
+		let inner = '' // for open-text
+		if (this.state.type === 'multi') inner = multi
+		if (this.state.type === 'scalar') inner = slider
+
 
 		return (
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
@@ -208,6 +212,18 @@ class QuestionBuilder extends React.Component {
 									name={`${this.state.questionText}toggle`}
 									type="radio"
 									className="with-gap"
+									checked={this.state.type === 'open'}
+									onClick={() => this.setState({type: 'open'})}
+								/>
+								<span>Open</span>
+							</label>
+						</p>
+						<p>
+							<label>
+								<input
+									name={`${this.state.questionText}toggle`}
+									type="radio"
+									className="with-gap"
 									checked={this.state.type === 'scalar'}
 									onClick={() => this.setState({type: 'scalar'})}
 								/>
@@ -228,7 +244,7 @@ class QuestionBuilder extends React.Component {
 						</p>
 					</aside>
 					<div className="col s12">
-						{this.state.type === 'multi' ? multi : slider}
+						{inner}
 					</div>
 				</div>
 

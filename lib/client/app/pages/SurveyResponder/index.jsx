@@ -47,6 +47,13 @@ function recurAndGetQuestions(question, prev = '') {
 			// do this
 			const inp = elem.querySelector(selector)
 			ret.value = inp.value || 'Not found on form'
+		} else if (elem.dataset.questionType === 'open') {
+			const inp = elem.querySelector(selector.replace('input', 'textarea'))
+			ret.value = inp.value
+			if (!inp.value) {
+				parent.classList.add('invalid-response')
+				return false
+			}
 		}
 
 
@@ -96,7 +103,6 @@ class SurveyResponder extends React.Component {
 			inst.open()
 			return
 		}
-		console.log({questionsAndAnswers})
 		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
 		if (resp.ok) {
 			M.toast({html: 'Successfully saved result'})

@@ -7,6 +7,7 @@ import QuestionBuilder from './question-builder'
 import Modal from '../../partials/modal'
 import {fetchJSON} from '../../util'
 
+// todo: add some validation for question text and value
 function extractData(question, level) {
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
@@ -16,6 +17,7 @@ function extractData(question, level) {
 	// create a dataset to return
 	// should be of form: {questionText, type, [options]} or {questionText, type, maxVal}
 	const ds = {questionText, type, required}
+
 
 	// fetch and recur
 	if (type === 'multi') {
@@ -36,7 +38,7 @@ function extractData(question, level) {
 			})
 			ds.options = options
 		}
-	} else {
+	} else if (type === 'scalar') {
 		const scalarInput = question.querySelector('.slider-input>input')
 		ds.maxVal = parseInt(scalarInput.value, 10)
 	}
