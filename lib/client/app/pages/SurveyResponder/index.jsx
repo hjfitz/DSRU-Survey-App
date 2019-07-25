@@ -22,8 +22,9 @@ function recurAndGetQuestions(question, prev = '') {
 	}
 	// multi choice
 	if (elem) {
-		// todo: work on better displaying this, perhaps red shadow. will need to traverse with parentElemenet.parentElement
-		elem.classList.remove('red')
+		// find parent elem
+		const parent = elem.parentElement.parentElement
+		parent.classList.remove('invalid-response')
 
 		const {required} = elem.dataset
 		if (elem.dataset.questionType === 'multi') {
@@ -36,7 +37,7 @@ function recurAndGetQuestions(question, prev = '') {
 				const isRequired = (required === 'true')
 				if (isRequired) {
 					// colour the element
-					elem.classList.add('red')
+					parent.classList.add('invalid-response')
 					return false
 				}
 			}
@@ -48,17 +49,18 @@ function recurAndGetQuestions(question, prev = '') {
 			const inp = elem.querySelector(selector)
 			ret.value = inp.value || 'Not found on form'
 		}
-	}
 
-	if (question.options) {
-		ds.push(
-			question.options
-				.filter(option => option.question)
-				.map(option => recurAndGetQuestions(option.question, `${questionText} (${option.value}) > `)),
-			// for without a prefix
-			// .map(option => recurAndGetQuestions(option.question)),
 
-		)
+		if (question.options) {
+			ds.push(
+				question.options
+					.filter(option => option.question)
+					.map(option => recurAndGetQuestions(option.question, `${questionText} (${option.value}) > `)),
+				// for without a prefix
+				// .map(option => recurAndGetQuestions(option.question)),
+
+			)
+		}
 	}
 
 	return ds
@@ -116,9 +118,9 @@ class SurveyResponder extends React.Component {
 				</div>
 				<Modal
 					inRef={ref => this.modal = ref}
-					text={`# There Was a Problem!
+					text={`##### There Was a Problem Saving Your Results!
 
-Please ensure that you have responded to every question.
+Please ensure that you respond to every required question
 				`}
 				/>
 			</div>

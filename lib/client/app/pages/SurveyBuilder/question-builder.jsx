@@ -10,7 +10,11 @@ class QuestionBuilder extends React.Component {
 			questionText: props.questionText,
 			options: props.options || [],
 			maxVal: props.maxVal || 5,
-			required: props.required || true,
+			// used as we want to declare it as false and otherwise return true
+			// mongo questions in edit mode have 'false' as a required option
+			// however, undefined is falsey and we wish for *new* questions to default to true
+			// eslint-disable-next-line no-unneeded-ternary
+			required: (props.required === false) ? false : true,
 		}
 		this.questionText = React.createRef()
 		this.subQuestions = []
@@ -161,6 +165,7 @@ class QuestionBuilder extends React.Component {
 			</>
 		)
 
+
 		return (
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
 				<div className="row">
@@ -214,12 +219,10 @@ class QuestionBuilder extends React.Component {
 							<label>
 								<input
 									type="checkbox"
-									defaultChecked={this.state.required}
-									checked={this.state.required}
+									defaultChecked={this.state.required || null}
+									checked={this.state.required || null}
 									className="question-required"
-									onChange={() => {
-										this.setState({required: !this.state.required})
-									}}
+									onChange={() => this.setState({required: !this.state.required})}
 								/>
 								<span>Required</span>
 							</label>
