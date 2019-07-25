@@ -51,6 +51,7 @@ class MultiGroup extends React.Component {
 									checked={idx === this.state.selected}
 									value={option.value}
 									data-question-name={this.props.questionText}
+									data-question-id={this.props.id}
 								/>
 								<span>{option.value}</span>
 							</label>
@@ -84,12 +85,12 @@ class Question extends React.Component {
 		let inner = ''
 		const questionType = props.type.toLowerCase()
 		if (questionType === 'multi') {
-			inner = <MultiGroup options={props.options} questionText={props.questionText} />
+			inner = <MultiGroup options={props.options} questionText={props.questionText} id={props._id} />
 		} else if (questionType === 'scalar') {
 			inner = (
 				<form action="#">
 					<p className="range-field">
-						<input type="range" min="1" max={props.maxVal} ref={this.range} data-question-name={props.questionText} />
+						<input type="range" min="1" max={props.maxVal} ref={this.range} data-question-name={props.questionText} data-question-id={props._id} />
 					</p>
 				</form>
 			)
@@ -103,7 +104,7 @@ class Question extends React.Component {
 						<p>{props.idx + 1}) {props.questionText}</p>
 						{props.required ? <p className="required-text">Required</p> : ''}
 					</span>
-					<div data-question-name={props.questionText} data-question-type={questionType} data-required={props.required}>
+					<div data-question-id={props._id} data-question-name={props.questionText} data-question-type={questionType} data-required={props.required}>
 						{inner}
 					</div>
 				</div>

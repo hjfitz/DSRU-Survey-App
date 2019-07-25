@@ -9,13 +9,13 @@ import Modal from '../../partials/modal'
 
 
 function recurAndGetQuestions(question, prev = '') {
-	const {questionText} = question
+	const {questionText, _id: id} = question
 
-	const elem = document.querySelector(`div[data-question-name="${questionText}"]`)
-	const ret = {questionText: prev + questionText, value: 'No response'}
+	const elem = document.querySelector(`div[data-question-id="${id}"]`)
+	const ret = {questionText: `${prev + questionText} (id: ${id})`, value: 'No response'}
 
 	const ds = [ret]
-	const selector = `input[data-question-name="${questionText}"]`
+	const selector = `input[data-question-id="${id}"]`
 	// no element? user has not unihdden the correct option
 	if (!elem) {
 		ret.value = 'Not found on form'
@@ -94,6 +94,7 @@ class SurveyResponder extends React.Component {
 			inst.open()
 			return
 		}
+		console.log({questionsAndAnswers})
 		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
 		if (resp.ok) {
 			M.toast({html: 'Successfully saved result'})
@@ -104,7 +105,7 @@ class SurveyResponder extends React.Component {
 	}
 
 	render() {
-		if (this.state.redir) return <Redirect to={`/thanks?title=${encodeURIComponent(this.state.title)}`} />
+		// if (this.state.redir) return <Redirect to={`/thanks?title=${encodeURIComponent(this.state.title)}`} />
 		return (
 			<div className="row">
 				<div className="col s12">
