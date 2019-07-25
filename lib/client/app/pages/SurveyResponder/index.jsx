@@ -120,7 +120,9 @@ class SurveyResponder extends React.Component {
 					inRef={ref => this.modal = ref}
 					text={`##### There Was a Problem Saving Your Results!
 
-Please ensure that you respond to every required question
+Please ensure that you respond to every required question.
+
+Missing questions are outlined in red.
 				`}
 				/>
 			</div>
