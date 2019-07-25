@@ -1,6 +1,7 @@
 import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 import M from 'materialize-css'
+import RadioButton from '../../partials/radio-button'
 
 class QuestionBuilder extends React.Component {
 	constructor(props) {
@@ -16,7 +17,6 @@ class QuestionBuilder extends React.Component {
 			required: props.required !== false,
 		}
 		this.questionText = React.createRef()
-		this.subQuestions = []
 		this.appendOption = this.appendOption.bind(this)
 		this.removeOption = this.removeOption.bind(this)
 		this.addSubquestion = this.addSubquestion.bind(this)
@@ -28,10 +28,8 @@ class QuestionBuilder extends React.Component {
 
 	appendOption() {
 		const options = cloneDeep(this.state.options)
-		options.push({
-			value: '',
-			question: null, // if there is a subquestion, it should follow: { type, questionText, options }
-		})
+		// if there is a subquestion, it should follow: { type, questionText, options }
+		options.push({value: '', question: null})
 		this.setState({options})
 	}
 
@@ -65,12 +63,13 @@ class QuestionBuilder extends React.Component {
 	}
 
 	render() {
-		this.subQuestions = []
+		const {type, questionText, maxVal} = this.state
+
 		const slider = (
 			<>
 				Maximum value:
 				<div className="input-field inline slider-input">
-					<input type="number" name="max-val" id="max-val" value={this.state.maxVal} onChange={ev => this.setState({maxVal: ev.target.value})} />
+					<input type="number" name="max-val" id="max-val" value={maxVal} onChange={ev => this.setState({maxVal: ev.target.value})} />
 				</div>
 			</>
 		)
@@ -165,8 +164,8 @@ class QuestionBuilder extends React.Component {
 		)
 
 		let inner = '' // for open-text
-		if (this.state.type === 'multi') inner = multi
-		if (this.state.type === 'scalar') inner = slider
+		if (type === 'multi') inner = multi
+		if (type === 'scalar') inner = slider
 
 
 		return (
@@ -194,42 +193,24 @@ class QuestionBuilder extends React.Component {
 					</div>
 					<aside className="col m3 s12">
 						Question Type:
-						<p>
-							<label>
-								<input
-									name={`${this.state.questionText}toggle`}
-									type="radio"
-									className="with-gap"
-									checked={this.state.type === 'multi'}
-									onClick={() => this.setState({type: 'multi'})}
-								/>
-								<span>Multiple choice</span>
-							</label>
-						</p>
-						<p>
-							<label>
-								<input
-									name={`${this.state.questionText}toggle`}
-									type="radio"
-									className="with-gap"
-									checked={this.state.type === 'open'}
-									onClick={() => this.setState({type: 'open'})}
-								/>
-								<span>Open</span>
-							</label>
-						</p>
-						<p>
-							<label>
-								<input
-									name={`${this.state.questionText}toggle`}
-									type="radio"
-									className="with-gap"
-									checked={this.state.type === 'scalar'}
-									onClick={() => this.setState({type: 'scalar'})}
-								/>
-								<span>Scalar</span>
-							</label>
-						</p>
+						<RadioButton
+							label="Multiple choice"
+							name={`${questionText}toggle`}
+							checked={type === 'multi'}
+							cb={() => this.setState({type: 'multi'})}
+						/>
+						<RadioButton
+							label="Open"
+							name={`${questionText}toggle`}
+							checked={type === 'open'}
+							cb={() => this.setState({type: 'open'})}
+						/>
+						<RadioButton
+							label="Scalar"
+							name={`${questionText}toggle`}
+							checked={type === 'scalar'}
+							cb={() => this.setState({type: 'scalar'})}
+						/>
 						<p className="required-toggle">
 							<label>
 								<input
