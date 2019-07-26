@@ -52,6 +52,7 @@ class SurveyBuilder extends React.Component {
 			questions: [],
 			surveyName: '',
 			introText: '',
+			redirTo: '/dash',
 		}
 		this.fetchData = this.fetchData.bind(this)
 		this.changeTitle = this.changeTitle.bind(this)
@@ -64,6 +65,15 @@ class SurveyBuilder extends React.Component {
 	}
 
 	async componentDidMount() {
+		// check our auth status first
+		const authResp = await fetchJSON('/api/builder/checkauth')
+		if (!authResp.ok && authResp.status === 401) {
+			const prev = encodeURIComponent(window.location.pathname)
+			this.setState({redir: true, redirTo: `/login?prev=${prev}`}, () => {
+				M.toast({html: 'You need to login in order to edit or create a survey'})
+			})
+		}
+
 		// if we have an ID, we're in edit mode
 		if (this.props.match && this.props.match.params.id) {
 			const {id} = this.props.match.params
@@ -76,6 +86,10 @@ class SurveyBuilder extends React.Component {
 					surveyName: title,
 					edit: true,
 					introText,
+				})
+			} else if (resp.status === 404) {
+				this.setState({redir: true, redirTo: '/builder'}, () => {
+					M.toast({html: "Couldn't find the survey!"})
 				})
 			}
 		} else {
@@ -97,11 +111,8 @@ class SurveyBuilder extends React.Component {
 	}
 
 	appendQuestion() {
-		// clone so as not to mess with the current state (can be any number of levels of JSON)
 		const questions = cloneDeep(this.state.questions)
-		// question schema
 		questions.push({type: 'multi', questionText: null, options: []})
-		// update and re-render
 		this.setState({questions})
 	}
 
@@ -113,16 +124,13 @@ class SurveyBuilder extends React.Component {
 
 	async updateSurvey() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const surveyData = [...allQuestions].map(elem => extractData(elem, 1))
-		const newSurvey = {
-			questions: surveyData,
-			title: this.state.surveyName,
-			introText: this.state.introText,
-		}
+		const questions = [...allQuestions].map(elem => extractData(elem, 1))
+		const {introText, surveyName: title} = this.state
+		const newSurvey = {questions, title, introText}
 		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put').catch(console.log)
 		if (resp.ok) {
 			M.toast({html: 'Successfully updated survey'})
-			this.setState({redir: true})
+			this.setState({redir: true, redirTo: '/dash'})
 		} else {
 			const {message} = await resp.json()
 			M.toast({html: `There was an error updating: ${message}`})
@@ -131,27 +139,26 @@ class SurveyBuilder extends React.Component {
 
 	async fetchData() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const surveyData = [...allQuestions].map(elem => extractData(elem, 1))
-		const newSurvey = {
-			questions: surveyData,
-			title: this.state.surveyName,
-			introText: this.state.introText,
-		}
+		const questions = [...allQuestions].map(elem => extractData(elem, 1))
+		const {introText, surveyName: title} = this.state
+		const newSurvey = {questions, title, introText}
+
+		// in edit mode, pop up a prompt
 		if (this.state.edit) {
 			const inst = M.Modal.init(this.modal)
 			inst.open()
+			return
+		}
+
+		// building a new survey - POST it.
+		// todo: consider adding a prompt for this
+		const resp = await fetchJSON('/api/builder/new', newSurvey, 'POST')
+		if (!resp.ok) {
+			// user is unauthorised
 		} else {
-			const resp = await fetchJSON('/api/builder/new', newSurvey, 'POST')
-			if (!resp.ok) {
-				// user is unauthorised
-				if (resp.status === 401) {
-					this.setState({redir: true})
-				}
-			} else {
-				const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
-				M.toast({html: message})
-				this.setState({redir: true})
-			}
+			const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
+			M.toast({html: message})
+			this.setState({redir: true, redirTo: '/dash'})
 		}
 	}
 
@@ -184,7 +191,7 @@ class SurveyBuilder extends React.Component {
 
 
 	render() {
-		if (this.state.redir) return <Redirect to="/dash" />
+		if (this.state.redir) return <Redirect to={this.state.redirTo} />
 		const modalText = `# Warning
 Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**.
 
@@ -199,7 +206,7 @@ You can <a href="/api/builder/csv/${this.props.match.params.id}.csv" download>do
 							<div className="card-content">
 								{/* first row - title and intro */}
 								<div className="row">
-									<h5 className="col c12">Survey Information</h5>
+									<h5 className="col s12">Survey Information</h5>
 									<section className="input-field col s12">
 										<input
 											placeholder="Untitled Survey"
