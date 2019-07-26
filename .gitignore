@@ -62,4 +62,7 @@ typings/
 
 .cache
 
+public/survey-content/*.jpg
+public/survey-content/*.png
+public/survey-content/*.jpeg
 build/*

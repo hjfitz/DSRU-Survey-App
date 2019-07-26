@@ -8,9 +8,43 @@ import Modal from '../../partials/modal'
 import {fetchJSON} from '../../util'
 import Loader from '../../partials/loader'
 
+function imgToB64(file) {
+	return new Promise((res, rej) => {
+		const reader = new FileReader()
+		reader.addEventListener('load', () => res(reader.result), false)
+		reader.addEventListener('error', rej)
+		reader.readAsDataURL(file)
+	})
+}
+
+function resizeImg(dataUrl) {
+	const img = new Image()
+	img.src = dataUrl
+	return new Promise((res, rej) => {
+		img.onerror = rej
+		img.onload = async () => {
+			const {width, height} = img
+			const canvas = document.createElement('canvas')
+			const ctx = canvas.getContext('2d')
+			// scale to 1000 if the image is larger
+			if (width > 1000) {
+				const scalingFactor = width / 1000
+				const newWidth = width / scalingFactor
+				const newHeight = height / scalingFactor
+				canvas.height = newHeight
+				canvas.width = newWidth
+				ctx.drawImage(img, 0, 0, newWidth, newHeight)
+				const newDataUrl = canvas.toDataURL('image/jpeg', 1.0)
+				res(newDataUrl)
+			} else {
+				res(dataUrl)
+			}
+		}
+	})
+}
+
 // todo: add some validation for question text and value
-function extractData(question, level) {
-	console.log(question)
+async function extractData(question, level) {
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
 	const {questionType: type} = question.dataset
@@ -27,17 +61,28 @@ function extractData(question, level) {
 		const optsDOM = question.querySelectorAll(`.multi-input-level-${level}`)
 		// if there are options, add them
 		if (optsDOM && optsDOM.length) {
-			const options = [...optsDOM].map((option) => {
+			const options = await Promise.all([...optsDOM].map(async (option) => {
 				const {value} = option.querySelector('input.question-value')
 				const {value: helpText} = option.querySelector('textarea.question-help')
 				const optDS = {value, helpText}
+				console.log('attempting to find image')
+				try {
+					const {files: [file]} = option.querySelector('input.question-img')
+					console.log(option.querySelector('input.question-img'))
+					const dataUrl = await imgToB64(file)
+					const imgResized = await resizeImg(dataUrl)
+					console.log('found image', {imgResized})
+					optDS.imgUrl = imgResized
+				} catch (err) {
+					console.warn(err)
+				}
 				const subQuestion = option.querySelector(`.question-builder.level-${level + 1}`)
 				if (subQuestion) {
 					// recur if there's a lower level
-					optDS.question = extractData(subQuestion, level + 1)
+					optDS.question = await extractData(subQuestion, level + 1)
 				}
 				return optDS
-			})
+			}))
 			ds.options = options
 		}
 	} else if (type === 'scalar') {
@@ -145,7 +190,7 @@ class SurveyBuilder extends React.Component {
 
 	async fetchData() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const questions = [...allQuestions].map(elem => extractData(elem, 1))
+		const questions = await Promise.all([...allQuestions].map(elem => extractData(elem, 1)))
 		const {introText, surveyName: title} = this.state
 		const newSurvey = {questions, title, introText}
 

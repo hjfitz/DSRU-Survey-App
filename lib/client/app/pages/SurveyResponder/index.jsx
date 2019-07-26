@@ -31,6 +31,12 @@ class SurveyResponder extends React.Component {
 		}
 	}
 
+	componentDidUpdate() {
+		const images = document.querySelectorAll('.materialboxed')
+		console.log(images)
+		images.forEach(img => M.Materialbox.init(img))
+	}
+
 	async respond(ev) {
 		ev.preventDefault()
 		const questionsAndAnswers = flattenDeep(this.state.questions.map(qu => recurAndGetQuestions(qu)))
@@ -51,7 +57,7 @@ class SurveyResponder extends React.Component {
 	}
 
 	render() {
-		// if (this.state.redir) return <Redirect to={`/thanks?title=${encodeURIComponent(this.state.title)}`} />
+		if (this.state.redir) return <Redirect to={`/thanks?title=${encodeURIComponent(this.state.title)}`} />
 		return (
 			<div className="row">
 				<div className="col s12">

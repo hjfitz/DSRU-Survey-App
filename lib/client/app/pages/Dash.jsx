@@ -110,10 +110,16 @@ Do you wish to continue?`
 		if (!loaded) return <Loader />
 		return (
 			<>
-				<h1>Welcome!</h1>
 				<section className="row">
 					<div className="col s12">
-						<Link to="/builder" className="waves-effect waves-light btn">Create a new survey</Link>
+
+						<h1>Welcome!</h1>
+						<h3>You Have {this.state.surveys.length} Ongoing Surveys.</h3>
+					</div>
+				</section>
+				<section className="row">
+					<div className="col s12">
+						<Link className="waves-effect waves-light btn" to="/builder">Create an Survey</Link>
 					</div>
 				</section>
 				{surveys.map(survey => (

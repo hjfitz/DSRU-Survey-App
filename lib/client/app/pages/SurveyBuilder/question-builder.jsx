@@ -107,7 +107,7 @@ class QuestionBuilder extends React.Component {
 										<div className="file-field input-field">
 											<div className="btn right">
 												<span>File</span>
-												<input type="file" />
+												<input type="file" accept="image/png, image/jpeg, image/jpg" className="question-img" />
 											</div>
 											<div className="file-path-wrapper">
 												<input className="file-path validate" type="text" placeholder="Upload an image" />
@@ -150,7 +150,7 @@ class QuestionBuilder extends React.Component {
 												</div>
 											</div>
 										)
-										: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn col s12 m5">Add Sub-question</a>
+										: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn col s12 m6 push-m3">Add Sub-question</a>
 									}
 								</div>
 							</div>

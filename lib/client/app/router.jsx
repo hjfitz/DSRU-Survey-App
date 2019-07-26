@@ -17,7 +17,7 @@ import Thanks from './pages/Thanks'
 import Layout from './layout'
 
 const App = () => (
-	<Router onChange={console.log}>
+	<Router>
 		<Layout>
 			<Route exact path="/dash" component={Dashboard} />
 			<Route exact path="/builder" component={SurveyBuilder} />

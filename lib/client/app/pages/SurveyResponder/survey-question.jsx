@@ -18,6 +18,7 @@ class MultiGroup extends React.Component {
 	}
 
 	componentDidMount() {
+		// todo: move this to index.jsx
 		const range = document.querySelectorAll('input[type="range"]')
 		range.forEach(elem => M.Range.init(elem))
 	}
@@ -37,14 +38,18 @@ class MultiGroup extends React.Component {
 	}
 
 	render() {
+		const hasImages = this.state.options.filter(option => option.imgPath)
+		const outerClass = hasImages.length ? 'center-radio' : ''
 		// generate a random ID per place in hierarchy in order to select multiple items
 		return (
-			<>
+			<div className={`center-text ${outerClass}`}>
 				{this.state.options.map((option, idx) => (
 					<React.Fragment key={option._id}>
 						<p>
 							<label onClick={this.setSelected(idx)} data-question-group>
 								<input
+								// todo: images are in state. In order to display these, just show an image. Maybe add a check to change the stacking of the buttons
+								// todo: put the images in a modal thingy
 									name={this.state.groupID}
 									type="radio"
 									className="with-gap"
@@ -60,12 +65,17 @@ class MultiGroup extends React.Component {
 								? <i className="material-icons right cp grey-text" onClick={this.showHelp(option.helpText)}>help_outline</i>
 								: ''
 							}
+							{option.imgPath ? (
+								<div className="survey-image">
+									<img className="materialboxed" alt="" src={option.imgPath} />
+								</div>
+							) : ''}
 						</p>
 						{((idx === this.state.selected) && option.question) ? <Question {...option.question} idx={idx} /> : ''}
 					</React.Fragment>
 				))}
 				<Modal inRef={ref => this.modal = ref} id={this.state.groupID} header="information" text={this.state.helpText} />
-			</>
+			</div>
 		)
 	}
 }
