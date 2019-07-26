@@ -19,3 +19,10 @@ main {
 .p8 {
 	padding: 8px
 }
+
+.center {
+	position: fixed;
+	// specifically for the loader
+	left: calc(50% - 32px);
+    top: calc(50% - 32px);
+}

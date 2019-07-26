@@ -6,6 +6,7 @@ import {Redirect} from 'react-router-dom'
 import QuestionBuilder from './question-builder'
 import Modal from '../../partials/modal'
 import {fetchJSON} from '../../util'
+import Loader from '../../partials/loader'
 
 // todo: add some validation for question text and value
 function extractData(question, level) {
@@ -52,6 +53,7 @@ class SurveyBuilder extends React.Component {
 			questions: [],
 			surveyName: '',
 			introText: '',
+			edit: this.props.match && this.props.match.params.id,
 			redirTo: '/dash',
 		}
 		this.fetchData = this.fetchData.bind(this)
@@ -75,23 +77,26 @@ class SurveyBuilder extends React.Component {
 		}
 
 		// if we have an ID, we're in edit mode
-		if (this.props.match && this.props.match.params.id) {
+		if (this.state.edit) {
 			const {id} = this.props.match.params
-			// we're in edit mode. fetch the survey data and populate
-			const resp = await fetchJSON(`/api/builder/edit/${id}`)
-			if (resp.ok) {
-				const {questions, title, introText} = await resp.json()
-				this.setState({
-					questions,
-					surveyName: title,
-					edit: true,
-					introText,
-				})
-			} else if (resp.status === 404) {
-				this.setState({redir: true, redirTo: '/builder'}, () => {
-					M.toast({html: "Couldn't find the survey!"})
-				})
-			}
+			this.setState({loading: true}, async () => {
+				// we're in edit mode. fetch the survey data and populate
+				const resp = await fetchJSON(`/api/builder/edit/${id}`)
+				if (resp.ok) {
+					const {questions, title, introText} = await resp.json()
+					this.setState({
+						questions,
+						surveyName: title,
+						edit: true,
+						introText,
+						loading: false,
+					})
+				} else if (resp.status === 404) {
+					this.setState({redir: true, redirTo: '/builder'}, () => {
+						M.toast({html: "Couldn't find the survey!"})
+					})
+				}
+			})
 		} else {
 			// fetch the data from localStorage. Follow the usual schema
 		}
@@ -192,73 +197,75 @@ class SurveyBuilder extends React.Component {
 
 	render() {
 		if (this.state.redir) return <Redirect to={this.state.redirTo} />
+		if (this.state.loading) return <Loader />
 		const modalText = `# Warning
 Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**.
 
 You can <a href="/api/builder/csv/${this.props.match.params.id}.csv" download>download the dataset here before doing this.</a>`
+		if (!this.state.edit || !this.state.loading) {
+			return (
+				<div className="row">
+					<div className="col s12">
+						<div className="row">
 
-		return (
-			<div className="row">
-				<div className="col s12">
-					<div className="row">
+							<div className="card">
+								<div className="card-content">
+									{/* first row - title and intro */}
+									<div className="row">
+										<h5 className="col s12">Survey Information</h5>
+										<section className="input-field col s12">
+											<input
+												placeholder="Untitled Survey"
+												id="survey_title"
+												type="text"
+												className="validate"
+												value={this.state.surveyName}
+												onChange={this.changeTitle}
+											/>
+											<label htmlFor="survey_title" className="active">Survey Title</label>
+										</section>
 
-						<div className="card">
-							<div className="card-content">
-								{/* first row - title and intro */}
-								<div className="row">
-									<h5 className="col s12">Survey Information</h5>
-									<section className="input-field col s12">
-										<input
-											placeholder="Untitled Survey"
-											id="survey_title"
-											type="text"
-											className="validate"
-											value={this.state.surveyName}
-											onChange={this.changeTitle}
-										/>
-										<label htmlFor="survey_title" className="active">Survey Title</label>
-									</section>
-
-									<div className="input-field col s12">
-										<textarea
-											value={this.state.introText}
-											onChange={this.changeIntroText}
-											id="intro-text"
-											className="materialize-textarea"
-										/>
-										<label htmlFor="intro-text">Intro text</label>
+										<div className="input-field col s12">
+											<textarea
+												value={this.state.introText}
+												onChange={this.changeIntroText}
+												id="intro-text"
+												className="materialize-textarea"
+											/>
+											<label htmlFor="intro-text">Intro text</label>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div className="row">
-						{/* row - questions */}
-						{this.renderQuestions()}
-					</div>
-					<div className="row">
-						{/* final row, question setup */}
-						<a className="col s12 m4 waves-effect waves-light btn green" onClick={this.appendQuestion}>
+						<div className="row">
+							{/* row - questions */}
+							{this.renderQuestions()}
+						</div>
+						<div className="row">
+							{/* final row, question setup */}
+							<a className="col s12 m4 waves-effect waves-light btn green" onClick={this.appendQuestion}>
 								Add Question
-						</a>
-						<a className="col s12 m4 push-m4 waves-effect waves-light btn red" onClick={this.removeLastQuestion}>
+							</a>
+							<a className="col s12 m4 push-m4 waves-effect waves-light btn red" onClick={this.removeLastQuestion}>
 								Remove Question
-						</a>
+							</a>
+						</div>
+						<div className="row">
+							<a className="col s12 waves-effect waves-light btn" onClick={this.fetchData}>
+								{this.state.edit ? 'Save and Update Survey' : 'Create Survey'}
+							</a>
+						</div>
 					</div>
-					<div className="row">
-						<a className="col s12 waves-effect waves-light btn" onClick={this.fetchData}>
-							{this.state.edit ? 'Save and Update Survey' : 'Create Survey'}
-						</a>
-					</div>
+					<Modal
+						inRef={ref => this.modal = ref}
+						cbText="Continue"
+						cb={this.updateSurvey}
+						text={modalText}
+					/>
 				</div>
-				<Modal
-					inRef={ref => this.modal = ref}
-					cbText="Continue"
-					cb={this.updateSurvey}
-					text={modalText}
-				/>
-			</div>
-		)
+			)
+		}
 	}
 }
 

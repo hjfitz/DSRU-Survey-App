@@ -5,6 +5,7 @@ import M from 'materialize-css'
 
 import {fetchJSON} from '../util'
 import Modal from '../partials/modal'
+import Loader from '../partials/loader'
 
 async function copySurveyLink(id, title) {
 	const base = `${window.location.origin}/respond/${id}`
@@ -20,6 +21,7 @@ class Dash extends React.Component {
 			page: 1,
 			redir: false,
 			modalText: 'Should not see this',
+			loaded: false,
 		}
 		this.renderPaginator = this.renderPaginator.bind(this)
 	}
@@ -36,7 +38,7 @@ class Dash extends React.Component {
 		const resp = await fetchJSON(`/api/builder/all?page=${this.state.page}`)
 		if (resp.ok) {
 			const dashData = await resp.json()
-			this.setState(dashData)
+			this.setState({...dashData, loaded: true})
 		} else {
 			M.toast({html: 'You need to login to do this'})
 			this.setState({redir: true})
@@ -69,20 +71,33 @@ Do you wish to continue?`
 	}
 
 	renderPaginator() {
-		const maxPages = Math.ceil(this.state.count / 10)
+		const {page, count} = this.state
+		const maxPages = Math.ceil(count / 10)
 		if (maxPages === 1) return ''
 		const cb = page => this.setState({page}, this.fetchSurveyData)
 		const inner = Array.from({length: maxPages}).map((_, idx) => {
 			const curNo = idx + 1
-			const className = curNo === this.state.page ? 'active teal' : 'waves-effect'
+			const className = curNo === page ? 'active teal' : 'waves-effect'
 			return <li key={curNo} className={className} onClick={() => cb(curNo)}><a href="#!">{curNo}</a></li>
 		})
-		const firstChevClass = this.state.page === 1 ? 'disabled' : 'waves-effect'
-		const firstChevCallback = this.state.page === 1 ? () => {} : () => cb(this.state.page - 1)
-		const lastChevClass = this.state.page === maxPages ? 'disabled' : 'waves-effect'
-		const lastChevCallback = this.state.page === maxPages ? () => {} : () => cb(this.state.page + 1)
-		const firstChev = <li className={firstChevClass} onClick={firstChevCallback}><a href="#!"><i className="material-icons">chevron_left</i></a></li>
-		const lastChev = <li className={lastChevClass} onClick={lastChevCallback}><a href="#!"><i className="material-icons">chevron_right</i></a></li>
+		const firstChevClass = page === 1 ? 'disabled' : 'waves-effect'
+		const firstChevCallback = page === 1 ? () => {} : () => cb(page - 1)
+		const lastChevClass = page === maxPages ? 'disabled' : 'waves-effect'
+		const lastChevCallback = page === maxPages ? () => {} : () => cb(page + 1)
+		const firstChev = (
+			<li
+				className={firstChevClass}
+				onClick={firstChevCallback}
+			><a href="#!"><i className="material-icons">chevron_left</i></a>
+			</li>
+		)
+		const lastChev = (
+			<li
+				className={lastChevClass}
+				onClick={lastChevCallback}
+			><a href="#!"><i className="material-icons">chevron_right</i></a>
+			</li>
+		)
 		const paginator = (
 			<ul className="pagination center-align">
 				{firstChev}
@@ -94,9 +109,9 @@ Do you wish to continue?`
 	}
 
 	render() {
-		if (this.state.redir) {
-			return <Redirect to={`/login?prev=${encodeURIComponent(window.location.pathname)}`} />
-		}
+		const {redir, loaded, surveys, modalText, cb} = this.state
+		if (redir) return <Redirect to={`/login?prev=${encodeURIComponent(window.location.pathname)}`} />
+		if (!loaded) return <Loader />
 		return (
 			<>
 				<h1>Welcome!</h1>
@@ -105,7 +120,7 @@ Do you wish to continue?`
 						<Link to="/builder" className="waves-effect waves-light btn">Create a new survey</Link>
 					</div>
 				</section>
-				{this.state.surveys.map(survey => (
+				{surveys.map(survey => (
 					<section className="row" key={survey._id}>
 						<div className="col s12">
 							<div className="card horizontal">
@@ -130,7 +145,7 @@ Do you wish to continue?`
 						{this.renderPaginator()}
 					</div>
 				</div>
-				<Modal text={this.state.modalText} cb={this.state.cb} cbText="Delete" inRef={ref => this.modal = ref} />
+				<Modal text={modalText} cb={cb} cbText="Delete" inRef={ref => this.modal = ref} />
 			</>
 		)
 	}
