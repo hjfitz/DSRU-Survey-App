@@ -2,6 +2,7 @@ import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 import M from 'materialize-css'
 import RadioButton from '../../partials/radio-button'
+import Options from './options'
 
 class QuestionBuilder extends React.Component {
 	constructor(props) {
@@ -166,7 +167,7 @@ class QuestionBuilder extends React.Component {
 		let inner = '' // for open-text
 		if (type === 'multi') inner = multi
 		if (type === 'scalar') inner = slider
-
+		if (type === 'options') inner = <Options openOptions={this.state.openOptions} questionText={this.state.questionText} />
 
 		return (
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
@@ -185,9 +186,7 @@ class QuestionBuilder extends React.Component {
 								value={this.state.questionText}
 								type="text"
 								className="validate question-title"
-								onChange={(ev) => {
-									this.setState({questionText: ev.target.value})
-								}}
+								onChange={ev => this.setState({questionText: ev.target.value})}
 							/>
 						</div>
 					</div>
@@ -211,6 +210,12 @@ class QuestionBuilder extends React.Component {
 							checked={type === 'scalar'}
 							cb={() => this.setState({type: 'scalar'})}
 						/>
+						<RadioButton
+							label="Multiple Options"
+							name={`${questionText}toggle`}
+							checked={type === 'options'}
+							cb={() => this.setState({type: 'options'})}
+						/>
 						<p className="required-toggle">
 							<label>
 								<input
@@ -224,9 +229,9 @@ class QuestionBuilder extends React.Component {
 							</label>
 						</p>
 					</aside>
-					<div className="col s12">
+					<form className="col s12">
 						{inner}
-					</div>
+					</form>
 				</div>
 
 			</section>

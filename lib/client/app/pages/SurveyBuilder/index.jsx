@@ -10,6 +10,7 @@ import Loader from '../../partials/loader'
 
 // todo: add some validation for question text and value
 function extractData(question, level) {
+	console.log(question)
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
 	const {questionType: type} = question.dataset
@@ -21,7 +22,7 @@ function extractData(question, level) {
 
 
 	// fetch and recur
-	if (type === 'multi') {
+	if (type === 'multi' || type === 'options') {
 		// QuestionBuilder has a level, each input has the associated level (to handle sub-questions)
 		const optsDOM = question.querySelectorAll(`.multi-input-level-${level}`)
 		// if there are options, add them
@@ -197,7 +198,6 @@ class SurveyBuilder extends React.Component {
 
 	render() {
 		if (this.state.redir) return <Redirect to={this.state.redirTo} />
-		if (this.state.loading) return <Loader />
 		const modalText = `# Warning
 Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**.
 
@@ -266,6 +266,7 @@ You can <a href="/api/builder/csv/${this.props.match.params.id}.csv" download>do
 				</div>
 			)
 		}
+		return <Loader />
 	}
 }
 

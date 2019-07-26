@@ -30,10 +30,6 @@ class Dash extends React.Component {
 		this.fetchSurveyData()
 	}
 
-	componentDidUpdate() {
-		// this.fetchSurveyData()
-	}
-
 	async fetchSurveyData() {
 		const resp = await fetchJSON(`/api/builder/all?page=${this.state.page}`)
 		if (resp.ok) {

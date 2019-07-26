@@ -50,7 +50,8 @@ class MultiGroup extends React.Component {
 									className="with-gap"
 									checked={idx === this.state.selected}
 									value={option.value}
-									data-question-name={this.props.questionText}
+									OpenText
+data-question-name={this.props.questionText}
 									data-question-id={this.props.id}
 								/>
 								<span>{option.value}</span>
@@ -120,6 +121,8 @@ class Question extends React.Component {
 				</div>
 			)
 		}
+		// get options and map over option.options
+		// todo: better naming
 
 		return (
 
