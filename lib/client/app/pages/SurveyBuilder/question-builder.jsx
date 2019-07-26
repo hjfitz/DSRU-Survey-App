@@ -2,7 +2,7 @@ import React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 import M from 'materialize-css'
 import RadioButton from '../../partials/radio-button'
-import Options from './options'
+import Options from './multiple-options'
 
 class QuestionBuilder extends React.Component {
 	constructor(props) {
@@ -167,7 +167,7 @@ class QuestionBuilder extends React.Component {
 		let inner = '' // for open-text
 		if (type === 'multi') inner = multi
 		if (type === 'scalar') inner = slider
-		if (type === 'options') inner = <Options openOptions={this.state.openOptions} questionText={this.state.questionText} />
+		if (type === 'options') inner = <Options openOptions={this.state.options} questionText={this.state.questionText} />
 
 		return (
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>

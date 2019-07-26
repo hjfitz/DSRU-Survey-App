@@ -40,6 +40,7 @@ class SurveyResponder extends React.Component {
 			inst.open()
 			return
 		}
+		console.log(questionsAndAnswers)
 		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
 		if (resp.ok) {
 			M.toast({html: 'Successfully saved result'})
@@ -50,7 +51,7 @@ class SurveyResponder extends React.Component {
 	}
 
 	render() {
-		if (this.state.redir) return <Redirect to={`/thanks?title=${encodeURIComponent(this.state.title)}`} />
+		// if (this.state.redir) return <Redirect to={`/thanks?title=${encodeURIComponent(this.state.title)}`} />
 		return (
 			<div className="row">
 				<div className="col s12">

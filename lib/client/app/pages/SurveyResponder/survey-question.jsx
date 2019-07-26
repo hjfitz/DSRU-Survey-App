@@ -51,7 +51,7 @@ class MultiGroup extends React.Component {
 									checked={idx === this.state.selected}
 									value={option.value}
 									OpenText
-data-question-name={this.props.questionText}
+									data-question-name={this.props.questionText}
 									data-question-id={this.props.id}
 								/>
 								<span>{option.value}</span>
@@ -118,6 +118,19 @@ class Question extends React.Component {
 						data-question-id={props._id}
 					/>
 					<label htmlFor={`open-question-${props._id}`}>Response</label>
+				</div>
+			)
+		} else if (questionType === 'options') {
+			inner = (
+				<div>
+					{props.options.map(option => (
+						<p>
+							<label>
+								<input type="checkbox" value={option.value} />
+								<span>{option.value}</span>
+							</label>
+						</p>
+					))}
 				</div>
 			)
 		}

@@ -129,6 +129,7 @@ Do you wish to continue?`
 									<Link to={`/respond/${survey._id}`}>View</Link>
 									<Link to={`/builder/${survey._id}`}>Edit</Link>
 									<a className="cp" download href={`/api/builder/csv/${survey._id}.csv`}>Get CSV</a>
+									<a className="cp" download href={`/api/builder/csv/mapping/${survey._id}.csv`}>Get Mapping</a>
 									<a className="cp" onClick={() => copySurveyLink(survey._id, survey.title)}>Copy Link</a>
 									<a className="cp" onClick={this.deleteSurvey(survey._id, survey.title)}>Delete</a>
 								</div>
