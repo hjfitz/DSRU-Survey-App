@@ -14,6 +14,7 @@ function imgToB64(file) {
 		reader.addEventListener('load', () => res(reader.result), false)
 		reader.addEventListener('error', rej)
 		reader.readAsDataURL(file)
+		console.log(file)
 	})
 }
 
@@ -70,6 +71,7 @@ async function extractData(question, level) {
 					const {files: [file]} = option.querySelector('input.question-img')
 					console.log(option.querySelector('input.question-img'))
 					const dataUrl = await imgToB64(file)
+					M.toast({html: `Compressing "${file.name}"`})
 					const imgResized = await resizeImg(dataUrl)
 					console.log('found image', {imgResized})
 					optDS.imgUrl = imgResized
@@ -90,6 +92,19 @@ async function extractData(question, level) {
 		ds.maxVal = parseInt(scalarInput.value, 10)
 	}
 	return ds
+}
+
+function fetchWithProgress(url, body) {
+	return new Promise((res, rej) => {
+		const xhr = new XMLHttpRequest()
+		xhr.upload.onprogress = ev => M.toast({html: `Loading... ${ev.loaded / ev.total * 100}%`})
+		xhr.open('POST', url)
+		xhr.setRequestHeader('content-type', 'application/json')
+		xhr.setRequestHeader('accept', 'application/json')
+		xhr.send(JSON.stringify(body))
+		xhr.addEventListener('load', res)
+		xhr.addEventListener('error', rej)
+	})
 }
 
 class SurveyBuilder extends React.Component {
@@ -178,12 +193,14 @@ class SurveyBuilder extends React.Component {
 		const questions = [...allQuestions].map(elem => extractData(elem, 1))
 		const {introText, surveyName: title} = this.state
 		const newSurvey = {questions, title, introText}
-		const resp = await fetchJSON(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put').catch(console.log)
-		if (resp.ok) {
+		const resp = await fetchWithProgress(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put').catch(console.log)
+		// instead of response.json() and other methods
+
+		if (resp.status < 400) {
 			M.toast({html: 'Successfully updated survey'})
 			this.setState({redir: true, redirTo: '/dash'})
 		} else {
-			const {message} = await resp.json()
+			const {message} = JSON.parse(resp.responseText)
 			M.toast({html: `There was an error updating: ${message}`})
 		}
 	}
@@ -203,10 +220,18 @@ class SurveyBuilder extends React.Component {
 
 		// building a new survey - POST it.
 		// todo: consider adding a prompt for this
-		const resp = await fetchJSON('/api/builder/new', newSurvey, 'POST')
-		if (!resp.ok) {
+		// const resp = await fetchJSON('/api/builder/new', newSurvey, 'POST')
+
+		const resp = await fetchWithProgress('/api/builder/new', newSurvey)
+
+
+		if (resp.status === 401) {
 			// user is unauthorised
-		} else {
+			this.setState({redir: true, redirTo: '/login'})
+		} else if (resp.status === 413) {
+			M.toast({html: 'Uploaded images too big, size limit is 125mb!'})
+		// not an error. All good
+		} else if (resp.status < 400) {
 			const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
 			M.toast({html: message})
 			this.setState({redir: true, redirTo: '/dash'})
