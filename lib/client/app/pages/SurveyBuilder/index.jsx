@@ -272,7 +272,7 @@ class SurveyBuilder extends React.Component {
 
 
 	render() {
-		if (this.state.redir) return <Redirect to={this.state.redirTo} />
+		// if (this.state.redir) return <Redirect to={this.state.redirTo} />
 		const modalText = `# Warning
 Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**.
 
