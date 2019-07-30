@@ -67,7 +67,6 @@ async function extractData(question, level) {
 				const {value} = option.querySelector('input.question-value')
 				const {value: helpText} = option.querySelector('textarea.question-help')
 				const optDS = {value, helpText}
-				// todo: check here for data-has-image
 				const img = option.querySelector('input.question-img')
 				// if we have dataset.hasImg, don't overwrite -unless there is a file in the upload field
 				if (img && img.files && ((img.dataset.hasImage === 'false') || (img.dataset.hasImage === 'true' && img.files[0]))) {
@@ -272,7 +271,7 @@ class SurveyBuilder extends React.Component {
 
 
 	render() {
-		// if (this.state.redir) return <Redirect to={this.state.redirTo} />
+		if (this.state.redir) return <Redirect to={this.state.redirTo} />
 		const modalText = `# Warning
 Are you sure that you want to do this? In order to ensure that results remain consistent, **this will delete all currently collected responses**.
 
