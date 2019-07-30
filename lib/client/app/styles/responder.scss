@@ -26,6 +26,10 @@
 	flex-wrap: wrap;
 }
 
+.sub-question {
+	flex-basis: 100%;
+}
+
 @media screen and (max-width: 600px) {
 	// .center-radio {
 	// 	align-items: center;

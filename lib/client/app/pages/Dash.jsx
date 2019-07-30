@@ -114,7 +114,7 @@ Do you wish to continue?`
 					<div className="col s12">
 
 						<h1>Welcome!</h1>
-						<h3>You Have {this.state.surveys.length} Ongoing Surveys.</h3>
+						<h3>You Have {this.state.count} Ongoing Surveys.</h3>
 					</div>
 				</section>
 				<section className="row">

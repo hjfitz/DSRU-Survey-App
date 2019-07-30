@@ -32,9 +32,11 @@ class SurveyResponder extends React.Component {
 	}
 
 	componentDidUpdate() {
-		const images = document.querySelectorAll('.materialboxed')
-		console.log(images)
-		images.forEach(img => M.Materialbox.init(img))
+		const range = document.querySelectorAll('input[type="range"]')
+		const textarea = document.querySelectorAll('textarea')
+		range.forEach(elem => M.Range.init(elem))
+		textarea.forEach(area => M.CharacterCounter.init(area))
+		M.AutoInit()
 	}
 
 	async respond(ev) {
@@ -46,7 +48,6 @@ class SurveyResponder extends React.Component {
 			inst.open()
 			return
 		}
-		console.log(questionsAndAnswers)
 		const resp = await fetchJSON(`/api/survey/${this.props.match.params.id}`, questionsAndAnswers, 'post')
 		if (resp.ok) {
 			M.toast({html: 'Successfully saved result'})

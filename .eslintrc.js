@@ -13,9 +13,11 @@ module.exports = {
 		"camelcase": 0,
 
 		"no-underscore-dangle": 0,
+		"import/no-cycle": 1,
 		"no-param-reassign": 0,
 		"no-return-assign": 0,
 		"no-console": 0,
+		"no-void": 0,
 		"no-tabs": 0,
 
 		"object-curly-spacing": ["error", "never"],

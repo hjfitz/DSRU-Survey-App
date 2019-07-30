@@ -46,6 +46,7 @@ function resizeImg(dataUrl) {
 
 // todo: add some validation for question text and value
 async function extractData(question, level) {
+	console.log('fetching for', {question, level})
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
 	const {questionType: type} = question.dataset
@@ -66,17 +67,22 @@ async function extractData(question, level) {
 				const {value} = option.querySelector('input.question-value')
 				const {value: helpText} = option.querySelector('textarea.question-help')
 				const optDS = {value, helpText}
-				console.log('attempting to find image')
-				try {
-					const {files: [file]} = option.querySelector('input.question-img')
-					console.log(option.querySelector('input.question-img'))
-					const dataUrl = await imgToB64(file)
-					M.toast({html: `Compressing "${file.name}"`})
-					const imgResized = await resizeImg(dataUrl)
-					console.log('found image', {imgResized})
-					optDS.imgUrl = imgResized
-				} catch (err) {
-					console.warn(err)
+				// todo: check here for data-has-image
+				const img = option.querySelector('input.question-img')
+				// if we have dataset.hasImg, don't overwrite -unless there is a file in the upload field
+				if (img && img.files && ((img.dataset.hasImage === 'false') || (img.dataset.hasImage === 'true' && img.files[0]))) {
+					console.log(img)
+					try {
+						const {files: [file]} = img
+						const dataUrl = await imgToB64(file)
+						M.toast({html: `Compressing "${file.name}"`})
+						const imgResized = await resizeImg(dataUrl)
+						optDS.imgUrl = imgResized
+					} catch (err) {
+						console.warn(err)
+					}
+				} else if (img && img.dataset && img.dataset.origPath) {
+					optDS.imgUrl = img.dataset.origPath
 				}
 				const subQuestion = option.querySelector(`.question-builder.level-${level + 1}`)
 				if (subQuestion) {
@@ -91,14 +97,15 @@ async function extractData(question, level) {
 		const scalarInput = question.querySelector('.slider-input>input')
 		ds.maxVal = parseInt(scalarInput.value, 10)
 	}
+	console.log({ds})
 	return ds
 }
 
-function fetchWithProgress(url, body) {
+function fetchWithProgress(url, body, method = 'POST') {
 	return new Promise((res, rej) => {
 		const xhr = new XMLHttpRequest()
 		xhr.upload.onprogress = ev => M.toast({html: `Loading... ${ev.loaded / ev.total * 100}%`})
-		xhr.open('POST', url)
+		xhr.open(method, url)
 		xhr.setRequestHeader('content-type', 'application/json')
 		xhr.setRequestHeader('accept', 'application/json')
 		xhr.send(JSON.stringify(body))
@@ -190,27 +197,24 @@ class SurveyBuilder extends React.Component {
 
 	async updateSurvey() {
 		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const questions = [...allQuestions].map(elem => extractData(elem, 1))
+		const questions = await Promise.all([...allQuestions].map(elem => extractData(elem, 1)))
 		const {introText, surveyName: title} = this.state
 		const newSurvey = {questions, title, introText}
 		const resp = await fetchWithProgress(`/api/builder/edit/${this.props.match.params.id}`, newSurvey, 'put').catch(console.log)
 		// instead of response.json() and other methods
 
-		if (resp.status < 400) {
+		console.log({resp})
+
+		if (resp.target.status < 400) {
 			M.toast({html: 'Successfully updated survey'})
 			this.setState({redir: true, redirTo: '/dash'})
 		} else {
-			const {message} = JSON.parse(resp.responseText)
+			const message = resp.responseText
 			M.toast({html: `There was an error updating: ${message}`})
 		}
 	}
 
 	async fetchData() {
-		const allQuestions = document.querySelectorAll('.question-builder.level-1')
-		const questions = await Promise.all([...allQuestions].map(elem => extractData(elem, 1)))
-		const {introText, surveyName: title} = this.state
-		const newSurvey = {questions, title, introText}
-
 		// in edit mode, pop up a prompt
 		if (this.state.edit) {
 			const inst = M.Modal.init(this.modal)
@@ -218,20 +222,21 @@ class SurveyBuilder extends React.Component {
 			return
 		}
 
+		const allQuestions = document.querySelectorAll('.question-builder.level-1')
+		const questions = await Promise.all([...allQuestions].map(elem => extractData(elem, 1)))
+		const {introText, surveyName: title} = this.state
+		const newSurvey = {questions, title, introText}
 		// building a new survey - POST it.
-		// todo: consider adding a prompt for this
-		// const resp = await fetchJSON('/api/builder/new', newSurvey, 'POST')
-
 		const resp = await fetchWithProgress('/api/builder/new', newSurvey)
 
 
-		if (resp.status === 401) {
+		if (resp.target.status === 401) {
 			// user is unauthorised
 			this.setState({redir: true, redirTo: '/login'})
-		} else if (resp.status === 413) {
+		} else if (resp.target.status === 413) {
 			M.toast({html: 'Uploaded images too big, size limit is 125mb!'})
 		// not an error. All good
-		} else if (resp.status < 400) {
+		} else if (resp.target.status < 400) {
 			const message = this.state.edit ? 'Successfully updated survey' : 'Successfully created survey'
 			M.toast({html: message})
 			this.setState({redir: true, redirTo: '/dash'})

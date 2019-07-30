@@ -9,9 +9,8 @@
   "scripts": {
     "dev:client": "parcel lib/client/index.html --out-dir build --no-hmr",
     "start": "node lib/server",
-	"dev:server": "nodemon lib/server",
-	"dev": "concurrently --kill-others \"npm run dev:client\" \"npm run dev:server\""
-
+    "dev:server": "nodemon lib/server",
+    "dev": "concurrently --kill-others \"npm run dev:client\" \"npm run dev:server\""
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
@@ -55,6 +54,8 @@
     "react-router-dom": "^5.0.1",
     "regenerator-runtime": "^0.13.3",
     "shortid": "^2.2.14",
-    "whatwg-fetch": "^3.0.0"
+    "split": "^1.0.1",
+    "whatwg-fetch": "^3.0.0",
+    "winston": "^3.2.1"
   }
 }
