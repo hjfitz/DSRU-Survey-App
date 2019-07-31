@@ -61,8 +61,8 @@ function Fab(props) {
 	return (
 		<>
 			<div ref={props.inRef} className="fixed-action-btn fab">
-				<a className="btn-floating btn-large red">
-					<i className="large material-icons">mode_edit</i>
+				<a className="btn-floating btn-large teal">
+					<i className="large material-icons">menu</i>
 				</a>
 				<ul>
 					<li>
@@ -84,9 +84,18 @@ function Fab(props) {
 						><i className="material-icons">insert_chart</i>
 						</Link>
 					</li>
+					<li>
+						<a
+							href="/api/builder/logout"
+							className="btn-floating tooltipped"
+							data-position="left"
+							data-tooltip="Logout"
+						><i className="material-icons">exit_to_app</i>
+						</a>
+					</li>
 					<li onClick={() => setModalStatus(!showModal)}>
 						<a
-							className="btn-floating tooltipped yellow darken-1"
+							className="btn-floating tooltipped purple darken-1"
 							data-position="left"
 							data-tooltip="Change the admin password"
 						><i className="material-icons">vpn_key</i>

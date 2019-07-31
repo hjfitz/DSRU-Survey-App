@@ -4,49 +4,13 @@ import M from 'materialize-css'
 import {Redirect} from 'react-router-dom'
 
 import QuestionBuilder from './question-builder'
+import {resizeImg, imgToB64} from './handle-images'
 import Modal from '../../partials/modal'
-import {fetchJSON} from '../../util'
+import {fetchJSON, fetchWithProgress} from '../../util'
 import Loader from '../../partials/loader'
-
-function imgToB64(file) {
-	return new Promise((res, rej) => {
-		const reader = new FileReader()
-		reader.addEventListener('load', () => res(reader.result), false)
-		reader.addEventListener('error', rej)
-		reader.readAsDataURL(file)
-		console.log(file)
-	})
-}
-
-function resizeImg(dataUrl) {
-	const img = new Image()
-	img.src = dataUrl
-	return new Promise((res, rej) => {
-		img.onerror = rej
-		img.onload = async () => {
-			const {width, height} = img
-			const canvas = document.createElement('canvas')
-			const ctx = canvas.getContext('2d')
-			// scale to 1000 if the image is larger
-			if (width > 1000) {
-				const scalingFactor = width / 1000
-				const newWidth = width / scalingFactor
-				const newHeight = height / scalingFactor
-				canvas.height = newHeight
-				canvas.width = newWidth
-				ctx.drawImage(img, 0, 0, newWidth, newHeight)
-				const newDataUrl = canvas.toDataURL('image/jpeg', 1.0)
-				res(newDataUrl)
-			} else {
-				res(dataUrl)
-			}
-		}
-	})
-}
 
 // todo: add some validation for question text and value
 async function extractData(question, level) {
-	console.log('fetching for', {question, level})
 	// get title, type and then based on type, maxVal or options
 	const {value: questionText} = question.querySelector('.question-title')
 	const {questionType: type} = question.dataset
@@ -96,21 +60,7 @@ async function extractData(question, level) {
 		const scalarInput = question.querySelector('.slider-input>input')
 		ds.maxVal = parseInt(scalarInput.value, 10)
 	}
-	console.log({ds})
 	return ds
-}
-
-function fetchWithProgress(url, body, method = 'POST') {
-	return new Promise((res, rej) => {
-		const xhr = new XMLHttpRequest()
-		xhr.upload.onprogress = ev => M.toast({html: `Loading... ${ev.loaded / ev.total * 100}%`})
-		xhr.open(method, url)
-		xhr.setRequestHeader('content-type', 'application/json')
-		xhr.setRequestHeader('accept', 'application/json')
-		xhr.send(JSON.stringify(body))
-		xhr.addEventListener('load', res)
-		xhr.addEventListener('error', rej)
-	})
 }
 
 class SurveyBuilder extends React.Component {
@@ -130,7 +80,6 @@ class SurveyBuilder extends React.Component {
 		this.removeQuestion = this.removeQuestion.bind(this)
 		this.updateSurvey = this.updateSurvey.bind(this)
 		this.changeIntroText = this.changeIntroText.bind(this)
-		// this.createSurvey = this.createSurvey.bind
 	}
 
 	async componentDidMount() {

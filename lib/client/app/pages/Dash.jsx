@@ -70,7 +70,7 @@ Do you wish to continue?`
 		const {page, count} = this.state
 		const maxPages = Math.ceil(count / 10)
 		if (maxPages === 1) return ''
-		const cb = page => this.setState({page}, this.fetchSurveyData)
+		const cb = newPage => this.setState({page: newPage}, this.fetchSurveyData)
 		const inner = Array.from({length: maxPages}).map((_, idx) => {
 			const curNo = idx + 1
 			const className = curNo === page ? 'active teal' : 'waves-effect'
