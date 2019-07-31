@@ -6,7 +6,6 @@ import M from 'materialize-css'
 import {fetchJSON} from '../util'
 import Modal from '../partials/modal'
 import Loader from '../partials/loader'
-import Fab from '../partials/fab'
 
 async function copySurveyLink(id, title) {
 	const base = `${window.location.origin}/respond/${id}`
@@ -29,13 +28,6 @@ class Dash extends React.Component {
 
 	componentDidMount() {
 		this.fetchSurveyData()
-	}
-
-	// updates after we get data - initial mount doesn't render FAB or the tooltips within
-	componentDidUpdate() {
-		M.FloatingActionButton.init(this.fab)
-		const elems = document.querySelectorAll('.tooltipped')
-		M.Tooltip.init(elems)
 	}
 
 	async fetchSurveyData() {
@@ -157,7 +149,6 @@ Do you wish to continue?`
 					</div>
 				</div>
 				<Modal text={modalText} cb={cb} cbText="Delete" inRef={ref => this.modal = ref} />
-				<Fab inRef={ref => this.fab = ref} />
 				<Modal inRef={ref => this.passRef = ref}>
 					stuff
 				</Modal>

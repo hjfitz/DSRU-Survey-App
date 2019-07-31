@@ -15,16 +15,18 @@ import SurveyResponder from './pages/SurveyResponder'
 import Login from './pages/Login'
 import Thanks from './pages/Thanks'
 import Layout from './layout'
+import Fab from './partials/fab'
 
 const App = () => (
 	<Router>
 		<Layout>
+			<Route path="/respond/:id" component={SurveyResponder} />
+			<Route exact path="/thanks" component={Thanks} />
 			<Route exact path="/dash" component={Dashboard} />
 			<Route exact path="/builder" component={SurveyBuilder} />
 			<Route exact path="/login" component={Login} />
-			<Route exact path="/thanks" component={Thanks} />
-			<Route path="/respond/:id" component={SurveyResponder} />
 			<Route path="/builder/:id" component={SurveyBuilder} />
+			<Route path={['/dash', '/builder', '/builder/:id']} component={Fab} />
 		</Layout>
 	</Router>
 )

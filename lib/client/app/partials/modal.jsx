@@ -2,7 +2,7 @@ import React from 'react'
 import Markdown from './markdown'
 
 const Modal = props => (
-	<div ref={props.inRef} id="modal1" className="modal">
+	<div ref={props.inRef} id={props.id} className="modal">
 		<div className="modal-content">
 			<Markdown content={props.text || ''} />
 			{props.children}
