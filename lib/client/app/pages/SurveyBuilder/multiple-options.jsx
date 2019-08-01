@@ -44,7 +44,6 @@ class Options extends React.Component {
 
 									<div className="col s12">
 										<h6>{`Option ${idx + 1}: `}</h6>
-										<i className="material-icons right remove-button cp" onClick={this.props.removeSubQuestion}>clear</i>
 									</div>
 									<div className="col s12">
 										<div className="input-field">

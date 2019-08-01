@@ -77,7 +77,7 @@ class SurveyBuilder extends React.Component {
 		this.changeTitle = this.changeTitle.bind(this)
 		this.appendQuestion = this.appendQuestion.bind(this)
 		this.removeLastQuestion = this.removeLastQuestion.bind(this)
-		this.removeQuestion = this.removeQuestion.bind(this)
+		// this.removeQuestion = this.removeQuestion.bind(this)
 		this.updateSurvey = this.updateSurvey.bind(this)
 		this.changeIntroText = this.changeIntroText.bind(this)
 	}
@@ -210,7 +210,6 @@ class SurveyBuilder extends React.Component {
 							level={1}
 							{...props}
 							edit={this.state.edit}
-							removeSubQuestion={this.removeQuestion(idx)}
 						/>
 					</div>
 				</div>

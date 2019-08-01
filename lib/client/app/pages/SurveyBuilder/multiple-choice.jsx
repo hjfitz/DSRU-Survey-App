@@ -12,7 +12,7 @@ class MultiChoice extends React.Component {
 			questionText: props.questionText,
 		}
 		this.appendOption = this.appendOption.bind(this)
-		this.removeOption = this.removeOption.bind(this)
+		// this.removeOption = this.removeOption.bind(this)
 		this.addSubquestion = this.addSubquestion.bind(this)
 	}
 
@@ -32,8 +32,8 @@ class MultiChoice extends React.Component {
 	removeSubQuestion(idx) {
 		return () => {
 			const options = cloneDeep(this.state.options)
-			const [curOption] = options.filter(opt => opt._id === idx)
-			delete curOption.question
+			delete options[idx].question
+
 			this.setState({options})
 		}
 	}
@@ -120,19 +120,21 @@ class MultiChoice extends React.Component {
 								{/* if there's an existing subquestion, show it. if not, give the option */}
 								{option.question
 									? (
-										<div className="col s12">
-											<div className="card-panel">
-												<div className="row">
-													<QuestionBuilder
-														subText={`Sub-Question for "${this.props.questionText || 'No question given'}" (Option: "${option.value || 'No option set'}")`}
-														{...option.question}
-														idx={idx + 1}
-														level={this.props.level + 1}
-														removeSubQuestion={this.removeSubQuestion(option._id)}
-													/>
+										<>
+											<a onClick={this.removeSubQuestion(idx)} className="waves-effect waves-light btn col s12 m6 push-m3 red darken-1">Remove Sub-question</a>
+											<div className="col s12">
+												<div className="card-panel">
+													<div className="row">
+														<QuestionBuilder
+															subText={`Sub-Question for "${this.props.questionText || 'No question given'}" (Option: "${option.value || 'No option set'}")`}
+															{...option.question}
+															idx={idx + 1}
+															level={this.props.level + 1}
+														/>
+													</div>
 												</div>
 											</div>
-										</div>
+										</>
 									)
 									: <a onClick={this.addSubquestion(idx)} className="waves-effect waves-light btn col s12 m6 push-m3">Add Sub-question</a>
 								}
