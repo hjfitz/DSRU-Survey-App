@@ -47,7 +47,7 @@ class QuestionBuilder extends React.Component {
 		const {type, questionText, maxVal, options} = this.state
 
 		let inner = '' // for open-text
-		if (type === 'multi') inner = <MultiChoice options={options} questionText={questionText} level={this.props.level} />
+		if (type === 'multi') inner = <MultiChoice options={options} questionText={questionText} level={this.props.level} cb={this.props.removeSubQuestion} />
 		if (type === 'scalar') inner = <Slider maxVal={maxVal} cb={this.updState('maxVal')} />
 		if (type === 'options') inner = <Options openOptions={options} questionText={questionText} level={this.props.level} />
 
@@ -55,17 +55,17 @@ class QuestionBuilder extends React.Component {
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
 				<div className="row">
 					<div className="col s12">
-						<i className="material-icons right remove-button cp" onClick={this.props.removeSubQuestion}>clear</i>
+						{this.props.children}
 						<h5>{this.props.subText || `Question ${this.props.idx}`}</h5>
 					</div>
 					<div className="col s12" />
 					<div className="col m8 s12">
-						Question title:
-						<div className="inline input-field">
+						Question:
+						<div className="inline input-field col s12">
 							<input
 								ref={this.questionText}
 								placeholder="Question Name"
-								value={this.state.questionText}
+								value={this.state.questionText || undefined}
 								type="text"
 								className="validate question-title"
 								onChange={this.updState('questionText')}
@@ -74,7 +74,7 @@ class QuestionBuilder extends React.Component {
 						</div>
 					</div>
 					<aside className="col m4 s12">
-						Question Type:
+						Type:
 						<RadioButton
 							label="Multiple choice"
 							name={this.state.uniqueID}

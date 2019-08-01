@@ -14,6 +14,7 @@ class MultiChoice extends React.Component {
 		this.appendOption = this.appendOption.bind(this)
 		this.removeOption = this.removeOption.bind(this)
 		this.addSubquestion = this.addSubquestion.bind(this)
+		// this.removeSubQuestion = this.removeSubQuestion.bind(this)
 	}
 
 	addSubquestion(idx) {
@@ -32,9 +33,9 @@ class MultiChoice extends React.Component {
 	removeSubQuestion(idx) {
 		return () => {
 			const options = cloneDeep(this.state.options)
-			const [curOption] = options.filter(opt => opt._id === idx)
-			delete curOption.question
-			this.setState({options})
+			const cur = options[idx]
+			console.log(cur)
+			// this.setState({options})
 		}
 	}
 
@@ -54,7 +55,7 @@ class MultiChoice extends React.Component {
 	render() {
 		return [
 
-			<div className="row multi">
+			<div key="options-div" className="row multi">
 				{this.state.options.map((option, idx) => (
 					<React.Fragment key={this.props.questionText + idx}>
 						<div className={`col s12 multi-input-level-${this.props.level} option`}>
@@ -128,7 +129,7 @@ class MultiChoice extends React.Component {
 														{...option.question}
 														idx={idx + 1}
 														level={this.props.level + 1}
-														removeSubQuestion={this.removeSubQuestion(option._id)}
+														removeSubQuestion={this.removeSubQuestion(idx)}
 													/>
 												</div>
 											</div>
@@ -141,7 +142,7 @@ class MultiChoice extends React.Component {
 					</React.Fragment>
 				))}
 			</div>,
-			<div className="row">
+			<div key="button-div" className="row">
 				<a className="col s12 m4 waves-effect waves-light btn green darken-3" onClick={this.appendOption}>Add Option</a>
 				<a className="col s12 m4 push-m4 waves-effect waves-light btn red darken-3" onClick={this.removeOption}>Remove Option</a>
 			</div>,
