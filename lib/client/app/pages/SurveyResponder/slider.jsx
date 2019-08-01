@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react'
-import shortID from 'shortid'
 import M from 'materialize-css'
+import {generate} from 'shortid'
 
 function Slider(props) {
-	const id = shortID.generate()
+	const id = generate()
 	useEffect(() => {
-		const slider = document.getElementById(id)
-		M.Slider.init(slider)
+		const inp = document.getElementById(id)
+		M.Range.init(inp)
 	})
 	return (
 		<p className="range-field">

@@ -9,7 +9,8 @@ import Slider from './slider'
 const Question = (props) => {
 	let inner = ''
 	const questionType = props.type.toLowerCase()
-	if (questionType === 'multi') inner = <MultiGroup {...props} />
+	const parentNum = `${props.parentNum ? `${props.parentNum}.` : ''}${props.idx + 1}`
+	if (questionType === 'multi') inner = <MultiGroup {...props} parentNum={parentNum} />
 	else if (questionType === 'scalar') inner = <Slider {...props} />
 	else if (questionType === 'open') inner = <Open {...props} />
 	else if (questionType === 'options') inner = <MultiOptions {...props} />
@@ -20,7 +21,7 @@ const Question = (props) => {
 		<section className="card">
 			<div className="card-content">
 				<span className="card-title">
-					<p>{props.idx + 1}) {props.questionText}</p>
+					<p>{parentNum}) {props.questionText}</p>
 					{props.required ? <p className="required-text">Required</p> : ''}
 				</span>
 				<div

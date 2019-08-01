@@ -21,6 +21,7 @@ class MultiGroup extends React.Component {
 			groupID: shortid.generate(),
 		}
 		this.setSelected = this.setSelected.bind(this)
+		this.renderSubQuestion = this.renderSubQuestion.bind(this)
 	}
 
 	setSelected(num) {
@@ -59,8 +60,8 @@ class MultiGroup extends React.Component {
 	renderSubQuestion(option, idx) {
 		if ((idx === this.state.selected) && option.question) {
 			return (
-				<div className="sub-question">
-					<Question {...option.question} idx={idx} />
+				<div className="sub-question" key={`question-${option._id}`}>
+					<Question {...option.question} idx={idx} parentNum={this.props.parentNum} />
 				</div>
 			)
 		}
@@ -73,7 +74,7 @@ class MultiGroup extends React.Component {
 		// generate a random ID per place in hierarchy in order to select multiple items
 		const options = this.state.options.map((option, idx) => (
 			[
-				<p>
+				<p key={`option-${option._id}`}>
 					<label onClick={this.setSelected(idx)} data-question-group>
 						<input
 							name={this.state.groupID}

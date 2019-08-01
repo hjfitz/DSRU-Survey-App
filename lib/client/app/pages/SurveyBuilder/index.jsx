@@ -77,7 +77,7 @@ class SurveyBuilder extends React.Component {
 		this.changeTitle = this.changeTitle.bind(this)
 		this.appendQuestion = this.appendQuestion.bind(this)
 		this.removeLastQuestion = this.removeLastQuestion.bind(this)
-		this.removeQuestion = this.removeQuestion.bind(this)
+		// this.removeQuestion = this.removeQuestion.bind(this)
 		this.updateSurvey = this.updateSurvey.bind(this)
 		this.changeIntroText = this.changeIntroText.bind(this)
 	}
@@ -201,21 +201,16 @@ class SurveyBuilder extends React.Component {
 
 	renderQuestions() {
 		return this.state.questions.map((props, idx) => (
-			<div className="row">
-				<div className="col s12">
-					<div className="card" key={props.type + props.questionText + idx}>
-						<div className="card-content">
-							<div className="row">
-								<QuestionBuilder
-									idx={idx + 1}
-									origQuestion={idx + 1}
-									level={1}
-									{...props}
-									edit={this.state.edit}
-									removeSubQuestion={this.removeQuestion(idx)}
-								/>
-							</div>
-						</div>
+			<div className="card" key={props.type + props.questionText + idx}>
+				<div className="card-content">
+					<div className="row">
+						<QuestionBuilder
+							idx={idx + 1}
+							origQuestion={idx + 1}
+							level={1}
+							{...props}
+							edit={this.state.edit}
+						/>
 					</div>
 				</div>
 			</div>

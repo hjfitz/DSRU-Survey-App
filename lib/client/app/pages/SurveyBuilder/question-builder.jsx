@@ -30,15 +30,6 @@ class QuestionBuilder extends React.Component {
 		M.updateTextFields()
 	}
 
-	removeSubQuestion(idx) {
-		return () => {
-			const options = cloneDeep(this.state.options)
-			const [curOption] = options.filter(opt => opt._id === idx)
-			delete curOption.question
-			this.setState({options})
-		}
-	}
-
 	updState(key) {
 		return ev => this.setState({[key]: ev.target.value})
 	}
@@ -55,7 +46,6 @@ class QuestionBuilder extends React.Component {
 			<section className={`question-builder level-${this.props.level} col s12`} data-question-type={this.state.type}>
 				<div className="row">
 					<div className="col s12">
-						{this.props.children}
 						<h5>{this.props.subText || `Question ${this.props.idx}`}</h5>
 					</div>
 					<div className="col s12" />
