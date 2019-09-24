@@ -64,3 +64,6 @@ typings/
 
 public/survey-content/*
 build/*
+
+
+data/
