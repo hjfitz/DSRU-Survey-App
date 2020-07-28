@@ -13,12 +13,8 @@
     "dev:server": "nodemon lib/server",
     "dev": "concurrently --kill-others \"npm run dev:client\" \"npm run dev:server\""
   },
-  "sw-precache": {
-    "maximumFileSizeToCacheInBytes": 655360000
-  },
   "devDependencies": {
     "@babel/core": "^7.5.0",
-    "@babel/plugin-proposal-class-properties": "^7.5.0",
     "@babel/plugin-transform-runtime": "^7.5.0",
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.0",
@@ -33,7 +29,6 @@
     "eslint-plugin-react": "^7.14.2",
     "nodemon": "^1.19.1",
     "parcel": "^1.12.3",
-    "parcel-plugin-sw-precache": "^1.1.1",
     "sass": "^1.22.5"
   },
   "dependencies": {

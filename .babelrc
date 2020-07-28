@@ -4,13 +4,12 @@
 			"@babel/preset-env", {
 				"useBuiltIns": "usage",
 				"targets": {
-					"browsers": ["last 2 versions", "ios_saf >= 10", "ie >= 11"],
-				},
+					"browsers": ["last 2 versions", "ios_saf >= 10", "ie >= 11"]
+				}
 			}
-		],
+		]
 	],
 	"plugins": [
-		["@babel/plugin-transform-runtime", {"regenerator": true}],
-		"@babel/plugin-proposal-class-properties"
+		["@babel/plugin-transform-runtime", {"regenerator": true}]
 	]
 }
